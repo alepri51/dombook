@@ -1,0 +1,30 @@
+:focus {
+    outline: none!important;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar-track {
+    background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #9E9E9E;
+}
+
+.input-group.input-group--error label {
+    animation: none !important;
+}
+
+.overlay--active:before {
+    opacity: .0;
+}
+
+.shadow {
+    -webkit-filter: drop-shadow(2px 2px 2px #ccc);
+    filter: drop-shadow(2px 2px 2px #ccc);
+}
