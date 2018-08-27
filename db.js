@@ -12,7 +12,9 @@ let hash = value => {
 const mongoose = require('mongoose');
 const { Schema, Model } = mongoose;
 
-mongoose.connect('mongodb://localhost:32774/myapp', {
+const mongo_port = 32771;
+
+mongoose.connect(`mongodb://localhost:${mongo_port}/myapp`, {
     useNewUrlParser: true
 });
 
@@ -22,7 +24,7 @@ Model.prototype.projection = function() {
     let { _id, __v, ...keys } = this.schema.paths;
 
     let projection = Object.keys(keys).reduce((memo, key) => {
-        this[key] && (memo[key] = this[key]);
+        this[key] && !(keys[key] instanceof Schema.Types.ObjectId) && (memo[key] = this[key]);
         return memo;
     }, {});
 
@@ -44,7 +46,9 @@ let User = mongoose.model('User', new Schema({
 
 let Account = mongoose.model('Account', new Schema({
     hash: String,
-    email: String
+    email: String,
+    private_key: String,
+    public_key: String
 }));
 
 //////////////////////////MODELS//////////////////////////////////////

@@ -24,6 +24,7 @@
     "mongoose": "^5.2.9",
     "nanoid": "^1.2.1",
     "normalizr": "^3.2.4",
-    "socket.io": "^2.1.1"
+    "socket.io": "^2.1.1",
+    "ua-parser-js": "^0.7.18"
   }
 }

@@ -58,7 +58,8 @@ export default new Vuex.Store({
             requests_cache.reset();
         },
         INIT(state) {
-        
+            if(api) return;
+
             api = axios.create({ 
                 baseURL: `${BASE_URL}/api`,
                 headers: { 'Cache-Control': 'no-cache' },
@@ -115,7 +116,6 @@ export default new Vuex.Store({
             );
         },
         LOCATION(state, view) {
-            !api && this.commit('INIT');
             this.dispatch('execute', { endpoint: view, method: 'get' });
 
             state.view = view;
@@ -141,6 +141,7 @@ export default new Vuex.Store({
         },
         SET_TOKEN(state, token) {
             //token ? sessionStorage.setItem('token', token) : sessionStorage.removeItem('token');
+            
             if(token) { //ONLY SET AND SAVE TOKEN, NOT ALLOWED TO REMOVE DUE TO REMEMBER ANY USER
                 sessionStorage.setItem('token', token);
                 state.token = token;

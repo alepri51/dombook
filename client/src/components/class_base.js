@@ -31,28 +31,12 @@ export default {
         },
         commit(...args) {
             return this.$store.commit(...args);
-        },
-        registerComponent(name) {
-            this.commit('REGISTER_COMPONENT', name);
         }
     },
     computed: {
-        sign() {
-            return this.$store.state.sign;
-        },
-        authorized() {
-            return !this.sign.UNAUTHORIZED;
-        },
         state() {
             return this.$store.state;
         },
-        api() {
-            return this.$store.state.api;
-        },
-        auth() {
-            return this.$store.state.auth || {name: 'Аноним'};
-        },
-
         entities() {
             return this.$store.state.entities;
         }

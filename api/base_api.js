@@ -3,9 +3,9 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto2');
-const generate = require('nanoid/generate');
 
-const { User } = require('../db');
+
+const { User, Account } = require('../db');
 
 let KEYS_CACHE = {};
 
@@ -26,18 +26,7 @@ class API {
 
         this.error = void 0;
 
-        if(!token) {
-            let user = new User({
-                name: req.headers['user-agent']
-            });
-
-            user = user.projection();
-            user.insecure = true;
-            user.key = generate('abcdefghijklmnopqrstuvwxyz', 10);
-
-            this.token = this.signJWT(user, user.key, {});
-        }
-        else this.payload = this.verifyJWT(this.token);
+        token && (this.payload = this.verifyJWT(this.token));
     
 
         let self = this;
@@ -86,31 +75,19 @@ class API {
         return bcrypt.hashSync(value, salt);
     }
 
+    async keys() {
+        let { privateKey, publicKey } = await crypto.createKeyPair();
+
+        return { private_key: privateKey, public_key: publicKey };
+    }
+
     async createPassword(precision) {
         let salt = bcrypt.genSaltSync(10);
         return await crypto.createPassword(salt, precision || 32);
     }
 
-    async generateJWT(payload, private_key) {
-        //let jwtid = await this.createPassword(32)
-
-        /* let payload = {
-            jwtid,
-            member: member._id,
-            auth: {
-                member: member._id,
-                email: member.email,
-                name: member.name,
-                ref: member.ref,
-                group: member.group
-            },
-            key: member.wallet.publicKey
-        }; */
-
-        return this.signJWT(payload, private_key);
-    }
-
     signJWT(payload, private_key, options = {algorithm: 'RS256', expiresIn: '1000s'}) {
+        console.log('IAT:', payload.iat);
         delete payload.iat;
         delete payload.exp;
 
@@ -118,14 +95,11 @@ class API {
         return jwt.sign(payload, private_key, options);
     }
 
-    verifyJWT(token) {
+    verifyJWT(token, private_key) {
         let payload = jwt.decode(token);
 
         try {
             jwt.verify(token, payload.key);
-
-            //REFRESH TOKEN
-            this.token = this.signJWT(payload, private_key);
 
             return payload;
         }
@@ -133,6 +107,23 @@ class API {
             console.log('ERROR:', err);
             this.revokeJWT(payload.jwtid);
         };
+    }
+
+    async refreshJWT() {
+        let payload = this.payload;
+        //REFRESH TOKEN
+        let private_key = KEYS_CACHE[payload.id];
+
+        payload.insecure && (private_key = payload.key);
+
+        if(!private_key) {
+            let user = await User.findOne({ _id: payload.id }).populate('account');
+
+            private_key = user.account.private_key;
+            KEYS_CACHE[payload.id] = private_key;
+        }
+
+        this.token = this.signJWT(payload, private_key, payload.insecure ? {} : void 0);
     }
 
     async revokeJWT(id) {
