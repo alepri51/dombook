@@ -62,7 +62,7 @@ export default new Vuex.Store({
         RESET_CACHE(state) {
             requests_cache.reset();
         },
-        INIT(state) {
+        INIT(state, view) {
             if(api) return;
 
             api = axios.create({ 
@@ -88,7 +88,7 @@ export default new Vuex.Store({
 
                 error && !error.system && this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` });
                 //commit('REGISTER_MODAL', 'signin');
-                error && !error.system && auth.signed === 2 && this.commit('SHOW_MODAL', { signin: void 0 });
+                error && !error.system && auth.signed !== 1 && this.commit('SHOW_MODAL', { signin: void 0 });
 
                 response.error = error; //DO NOT REMOVE
 
@@ -109,6 +109,7 @@ export default new Vuex.Store({
             
             api.interceptors.response.use(onResponse, onError);
 
+            this.dispatch('execute', { endpoint: view, method: 'get' });
         },
         LOADING(state, value) {
             state.loading = value;
@@ -137,8 +138,6 @@ export default new Vuex.Store({
             );
         },
         LOCATION(state, view) {
-            //this.dispatch('execute', { endpoint: view, method: 'get' });
-
             state.view = view;
             state.notFound = false;
         },

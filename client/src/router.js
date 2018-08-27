@@ -18,7 +18,7 @@ let router = new Router({
 router.beforeEach(async (to, from, next) => {
     let name = to.path.slice(1);
     
-    store.commit('INIT');
+    store.commit('INIT', name);
     !store.state.token && await store.dispatch('execute', { cache: false, endpoint: 'signup.silent'});
 
     store.commit('REGISTER_VIEW', name);
