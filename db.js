@@ -24,7 +24,7 @@ Model.prototype.projection = function() {
     let { _id, __v, ...keys } = this.schema.paths;
 
     let projection = Object.keys(keys).reduce((memo, key) => {
-        this[key] && !(keys[key] instanceof Schema.Types.ObjectId) && (memo[key] = this[key]);
+        this[key] && !(keys[key] instanceof Schema.Types.ObjectId) && !(keys[key] instanceof Schema.Types.Embedded) && (memo[key] = this[key]);
         return memo;
     }, {});
 
@@ -38,18 +38,24 @@ let User = mongoose.model('User', new Schema({
         type: String,
         select: true
     },
-    account: { 
+    /* account: { 
         type: Schema.Types.ObjectId, 
         ref: 'Account' 
-    }
+    } */
+    account: new Schema({
+        hash: String,
+        email: String,
+        private_key: String,
+        public_key: String
+    })
 }));
 
-let Account = mongoose.model('Account', new Schema({
+/* let Account = mongoose.model('Account', new Schema({
     hash: String,
     email: String,
     private_key: String,
     public_key: String
-}));
+})); */
 
 //////////////////////////MODELS//////////////////////////////////////
 
@@ -83,5 +89,5 @@ let Account = mongoose.model('Account', new Schema({
 
 module.exports = {
     User,
-    Account
+    //Account
 }

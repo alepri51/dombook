@@ -1,29 +1,63 @@
 'use strict';
 
+const bcrypt = require('bcryptjs');
 const generate = require('nanoid/generate');
 const uaParser = require('ua-parser-js');
 
 const { API } = require('./base_api');
 const db = require('../db');
-let { User, Account } = db;
+let { User } = db;
 
 class SignIn extends API {
     constructor(...args) {
         super(...args);
+
+        this.error = void 0;
     }
 
-    async submit({email, password}) {
+    async submit({ email, password }) {
+        //await User.deleteMany();
+        let users = await User.find();
 
+        let current_user = await User.findOne({ _id: this.payload.id });
+        let user = await User.findOne({ 'account.email': email });
+
+        let auth = user && user.account && await bcrypt.compare(`${email}:${password}`, user.account.hash);
+
+        if(auth) {
+            !current_user.account && current_user.id !== user.id && await current_user.remove();
+
+            this.payload = user.projection();
+            this.payload.key = user.account.public_key;
+
+            this.payload.auth = {
+                id: user.id,
+                email: user.account.email,
+                name: user.name,
+                signed: 1
+            };
+        }
+        else {
+            this.error = {
+                code: 404,
+                message: 'Пользователь не найден'
+            }
+        }
     }
 }
 
 class SignOut extends API {
     constructor(...args) {
         super(...args);
+
+        this.error = void 0;
     }
 
-    async submit({email, password}) {
-
+    async submit({ email, password }) {
+        this.payload.auth = {
+            id: this.payload.auth.id,
+            signed: 0
+        };
     }
 }
 
@@ -32,42 +66,54 @@ class SignUp extends API {
         super(...args);
     }
 
-    async submit(params) {
-        //let users = await User.find();
-        let users = await User.find().populate('account');
-        let accounts = await Account.find();
-        await Account.deleteMany();
+    async submit(params, req) {
+        let { name, email, password } = params;
+        let current_user = await User.findOne({ _id: this.payload.id });
 
-        let user = await User.findOne({ _id: this.payload.id });
+        let user = await User.findOne({ 'account.email': email });
 
-        let { email, password } = params;
-        let { private_key, public_key } = await this.keys();
+        if(user) {
+            this.error = {
+                code: 403,
+                message: 'Данное имя уже используется. Попробуйте восстановить пароль.'
+            }
+        }
+        else {
+            user = !current_user.account ? current_user : new User({});
 
-        let account = new Account({
-            email,
-            hash: this.hash(email + ':' + password),
-            private_key, 
-            public_key
-        });
+            let { private_key, public_key } = await this.keys();
 
-        user.account = account;
+            let account = {
+                email,
+                hash: this.hash(email + ':' + password),
+                private_key, 
+                public_key
+            };
 
-        await user.save();
-        await account.save();
+            user.account = account;
+            user.name = name;
 
-        this.payload = user.projection();
-        this.payload.key = account.public_key;
-        this.payload.email = account.email;
+            await user.save();
 
-        this.token = this.signJWT(this.payload, account.private_key);
+            let payload = this.payload;
+
+            payload = user.projection();
+            payload.key = account.public_key;
+
+            payload.auth = {
+                id: user.id,
+                email: account.email,
+                name,
+                signed: 1
+            };
+
+            this.token = this.signJWT(payload, account.private_key);
+        }
     }
 
     async silent(params, req, res) {
-        //create silent user
-        //generate token
+        //ПРИДУМАТЬ МЕХАНИЗМ ПО УДАЛЕНИЮ УСТАРЕВШИХ ПОЛЬЗОВАТЕЛЕЙ
         let users = await User.find();
-
-        await User.deleteMany();
 
         let ua = uaParser(req.headers['user-agent']);
 
@@ -77,11 +123,19 @@ class SignUp extends API {
 
         await user.save();
 
-        user = user.projection();
-        user.insecure = true;
-        user.key = generate('abcdefghijklmnopqrstuvwxyz', 10);
+        let payload = this.payload;
 
-        this.token = this.signJWT(user, user.key, {});
+        payload = user.projection();
+        payload.insecure = true;
+        payload.key = generate('abcdefghijklmnopqrstuvwxyz', 10);
+
+        payload.auth = {
+            id: user.id,
+            signed: 0
+        };
+
+
+        this.token = this.signJWT(payload, payload.key, {});
 
         console.log(params);
     }

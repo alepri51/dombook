@@ -34,7 +34,7 @@ export default new Vuex.Store({
         modals: {},
         
         token: void 0,
-
+        auth: void 0,
         entities: {},
 
         snackbar: {
@@ -75,13 +75,20 @@ export default new Vuex.Store({
 
             let onResponse = (response => {
 
-                let {token, auth, error, entities, cached, ...rest} = response.data;
+                let {token, auth, error, entities, _cached, ...rest} = response.data;
 
                 //token MUST EXISTS!
                 this.commit('SET_TOKEN', token);
+                this.commit('SET_AUTH', auth);
+
+                error && !error.system && this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` });
+                response.error = error; //DO NOT REMOVE
 
                 //оставшиеся данные
                 response.rest_data = { ...rest };
+                
+                //SAVE CACHED STATE IF IS
+                response.data._cached = !!response.config.cache;
 
                 return response;
             });
@@ -116,7 +123,7 @@ export default new Vuex.Store({
             );
         },
         LOCATION(state, view) {
-            this.dispatch('execute', { endpoint: view, method: 'get' });
+            //this.dispatch('execute', { endpoint: view, method: 'get' });
 
             state.view = view;
             state.notFound = false;
@@ -141,11 +148,14 @@ export default new Vuex.Store({
         },
         SET_TOKEN(state, token) {
             //token ? sessionStorage.setItem('token', token) : sessionStorage.removeItem('token');
-            
+
             if(token) { //ONLY SET AND SAVE TOKEN, NOT ALLOWED TO REMOVE DUE TO REMEMBER ANY USER
                 sessionStorage.setItem('token', token);
                 state.token = token;
             }
+        },
+        SET_AUTH(state, auth) {
+            state.auth = auth;
         },
         SHOW_SNACKBAR(state, options) {
             state.snackbar.visible = true;
@@ -186,7 +196,7 @@ export default new Vuex.Store({
         },
     },
     actions: {
-        async execute({ commit, state }, { method, endpoint, payload, headers, callback }) {
+        async execute({ commit, state }, { cache = true, method, endpoint, payload, headers, callback }) {
             console.log('REQUEST:', endpoint);
 
             let response;
@@ -199,7 +209,7 @@ export default new Vuex.Store({
                 headers
             };
 
-            config.cache = config.method === 'get' ? requests_cache : false;
+            config.cache = config.method === 'get' ? cache ? requests_cache : false : false;
 
             commit('LOADING', true);
 

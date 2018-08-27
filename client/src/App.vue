@@ -14,9 +14,9 @@
             </transition>
         </v-content>
         
-        <signin/>
+        <!-- <signin/>
         <signup/>
-        <signout/>
+        <signout/> -->
 
         <v-snackbar
             @input="$store.commit('HIDE_SNACKBAR')"
@@ -44,9 +44,9 @@
         name: 'App',
         components: {
             navigation: () => import('./components/navigation'),
-            signin: () => import('./components/modals/signin'),
+            /* signin: () => import('./components/modals/signin'),
             signup: () => import('./components/modals/signup'),
-            signout: () => import('./components/modals/signout')
+            signout: () => import('./components/modals/signout') */
         }
     }
 </script>

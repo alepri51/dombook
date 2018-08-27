@@ -1,7 +1,7 @@
-import Base from './class_base';
+import Widget from './class_widget';
 
 export default {
-    extends: Base,
+    extends: Widget,
     methods: {
         registerComponent(name) {
             this.commit('REGISTER_COMPONENT', name);

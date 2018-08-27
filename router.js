@@ -33,16 +33,19 @@ let proccedRequest = async function(req, res) {
     let { action } = req.params;
 
     let object = req.object;
+    let result = {};
 
-    !object[action] && (action = 'default');
+    if(!object.error) {
+        !object[action] && (action = 'default');
 
-    let executor = action ? object[action].bind(object) : object.default.bind(object);
+        let executor = action ? object[action].bind(object) : object.default.bind(object);
 
-    let params = Object.keys(req.body).length === 0 ? req.query : req.body;
-    let result = await executor(params, req, res);
+        let params = Object.keys(req.body).length === 0 ? req.query : req.body;
+        result = await executor(params, req, res);
 
-    await object.refreshJWT();
-    
+        await object.refreshJWT(); //DO NOT REMOVE
+    }
+
     let { token, auth, error } = object;
 
     console.log('----------------END------------------');
@@ -50,7 +53,7 @@ let proccedRequest = async function(req, res) {
     console.log('RESULT:', result);
     console.log('----------------END------------------');
 
-    return { token, auth, error, ...result } || {};
+    return { token, auth, error, ...result };
 };
 
 let io = void 0;
@@ -64,7 +67,6 @@ router.all(patterns, processToken, async (req, res, next) => {
         let error = {
             code: err.code,
             message: err.message,
-            data: {},
             system: true
         }
         console.log('ERROR => ', err);

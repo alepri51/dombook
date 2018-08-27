@@ -8,6 +8,7 @@ export default {
         }
     },
     async created() {
+
         /* if(this.auth.member) {
             console.log('REGISTER EVENT:', `${this.auth.member}:update:${this.entity}`);
 
@@ -39,8 +40,14 @@ export default {
         },
         entities() {
             return this.$store.state.entities;
-        }
-
+        },
+        auth() {
+            return this.state.auth;
+        },
+        authenticated() {
+            //debugger;
+            return this.auth ? this.auth.signed !== 0 : false;
+        },
     }
 }
 

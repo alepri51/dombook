@@ -3,11 +3,13 @@
 const db = require('./db');
 const { Unknown } = require('./api/base_api');
 const auth = require('./api/auth_api');
+const project = require('./api/project_api');
 //const { SignIn, SignOut, SignUp } = require('./api/auth_api');
 
 let classes = {
     ...auth,
     ...db,
+    ...project,
     Unknown
 }
 

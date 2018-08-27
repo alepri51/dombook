@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto2');
 
 
-const { User, Account } = require('../db');
+const { User } = require('../db');
 
 let KEYS_CACHE = {};
 
@@ -40,6 +40,7 @@ class API {
                     
                     return function (...args) {
                         const result = method.apply(self, args);
+                        self.onExecuted && self.onExecuted(propKey, result);
                         return result;
                     };
                 }
@@ -48,6 +49,10 @@ class API {
         };
 
         return new Proxy(this, handler);
+    }
+
+    get auth() {
+        return this.payload && this.payload.auth;
     }
 
     get class_name() {
@@ -86,7 +91,7 @@ class API {
         return await crypto.createPassword(salt, precision || 32);
     }
 
-    signJWT(payload, private_key, options = {algorithm: 'RS256', expiresIn: '1000s'}) {
+    signJWT(payload, private_key, options = {algorithm: 'RS256', expiresIn: '10s'}) {
         console.log('IAT:', payload.iat);
         delete payload.iat;
         delete payload.exp;
@@ -95,7 +100,7 @@ class API {
         return jwt.sign(payload, private_key, options);
     }
 
-    verifyJWT(token, private_key) {
+    verifyJWT(token) {
         let payload = jwt.decode(token);
 
         try {
@@ -105,28 +110,39 @@ class API {
         }
         catch(err) {
             console.log('ERROR:', err);
-            this.revokeJWT(payload.jwtid);
+            //this.revokeJWT();
+            this.error = err;
+             
+            if(err.name === 'TokenExpiredError') {
+                this.error.expired = true;
+                this.error.system = true;
+
+                payload.auth.signed === 1 ? payload.auth.signed = 2 : payload.auth.signed = 0;
+                return payload;
+            }
         };
     }
 
     async refreshJWT() {
         let payload = this.payload;
-        //REFRESH TOKEN
-        let private_key = KEYS_CACHE[payload.id];
+        if(payload) {
+            //REFRESH TOKEN
+            let private_key = KEYS_CACHE[payload.id];
 
-        payload.insecure && (private_key = payload.key);
+            payload.insecure && (private_key = payload.key);
 
-        if(!private_key) {
-            let user = await User.findOne({ _id: payload.id }).populate('account');
+            if(!private_key) {
+                let user = await User.findOne({ _id: payload.id });
 
-            private_key = user.account.private_key;
-            KEYS_CACHE[payload.id] = private_key;
+                private_key = user.account.private_key;
+                KEYS_CACHE[payload.id] = private_key;
+            }
+
+            this.token = this.signJWT(payload, private_key, payload.insecure ? {} : void 0);
         }
-
-        this.token = this.signJWT(payload, private_key, payload.insecure ? {} : void 0);
     }
 
-    async revokeJWT(id) {
+    async revokeJWT() {
         this.token = void 0;
         this.payload = void 0;
     }
@@ -150,14 +166,20 @@ class SecuredAPI extends API {
     constructor(...args) {
         super(...args);
 
+        this.error = void 0;
     }
 
     checkSecurity(name, method) {
         let authError = function(...args) {
-            this.generateError({ code: 403, message: 'Отказано в доступе. Возможно Ваша сессия завершилась.', data: { expired: true, class: this.constructor.name }});
+            this.error = {
+                code: 403,
+                message: 'Отказано в доступе. Возможно Ваша сессия завершилась.'
+            };
+
+            //this.generateError({ code: 403, message: 'Отказано в доступе. Возможно Ваша сессия завершилась.', data: { expired: true, class: this.constructor.name }});
         };
 
-        return !this.auth && authError;
+        return this.auth.signed !== 1 && authError;
     }
 
     security(name, method) {

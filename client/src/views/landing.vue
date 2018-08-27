@@ -6,7 +6,10 @@
 </template>
 
 <script>
+    import Layout from '../components/class_layout';
+
     export default {
+        extends: Layout,
         components: {
             greeting: () => import('../components/greeting'),
             painpoint: () => import('../components/painpoint'),

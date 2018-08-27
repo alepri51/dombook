@@ -7,7 +7,7 @@ export default {
         widget
     },
     async created() {
-        //this.sign.AUTHORIZED && await this.execute({ endpoint: `${this.entity}` });
+        this.execute({ endpoint: this.entity, method: 'get' });
     },
     methods: {
     },
