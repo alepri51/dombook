@@ -24,7 +24,11 @@ export default {
         } */
     },
     watch: {
-        
+        'auth.signed': function(val) {
+            val === 1 && this.commit('RESET_CACHE');
+            val === 0 && this.commit('RESET_CACHE');
+            val === 0 && this.commit('RESET_ENTITIES');
+        }
     },
     methods: {
         execute(...args) {

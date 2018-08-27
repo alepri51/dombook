@@ -7,7 +7,7 @@
       <span class="secondary--text">Новостройки</span>
     </v-toolbar-title>
 
-    <v-tabs v-if="false"
+    <v-tabs v-if="menu"
         class="ml-2"
         v-model="active"
         slider-color="secondary"

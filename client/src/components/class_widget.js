@@ -7,9 +7,12 @@ export default {
         widget
     },
     async created() {
-        this.execute({ endpoint: this.entity, method: 'get' });
+        this.load();
     },
     methods: {
+        load() {
+            this.execute({ endpoint: this.entity, method: 'get' });
+        }
     },
     computed: {
         raw_data() {
@@ -20,6 +23,8 @@ export default {
         }
     },
     watch: {
-
+        'auth.signed': function(val, old) {
+            val === 1 && this.load();
+        }
     }
 }

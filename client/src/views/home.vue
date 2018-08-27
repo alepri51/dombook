@@ -1,6 +1,9 @@
 <template>
-    <div>
+    <div v-if="auth.signed !== 0">
         HOME PAGE
+    </div>
+    <div v-else>
+        ДОСТУП ЗАКРЫТ
     </div>
 </template>
 

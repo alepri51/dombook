@@ -47,11 +47,16 @@ export default new Vuex.Store({
             vertical: false
         },
 
+        menu: [
+            {
+                name: 'landing',
+                to: 'landing'
+            }
+        ],
         notFound: false
     },
     mutations: {
-        CLEAR_CACHE(state) {
-            requests_cache.reset();
+        RESET_ENTITIES(state) {
             state.entities = {}
         },
         RESET_CACHE(state) {
@@ -82,6 +87,9 @@ export default new Vuex.Store({
                 this.commit('SET_AUTH', auth);
 
                 error && !error.system && this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` });
+                //commit('REGISTER_MODAL', 'signin');
+                error && !error.system && auth.signed === 2 && this.commit('SHOW_MODAL', { signin: void 0 });
+
                 response.error = error; //DO NOT REMOVE
 
                 //оставшиеся данные
@@ -120,6 +128,12 @@ export default new Vuex.Store({
                     console.error(err);
                     return import(`./components/stub`);
                 })
+            );
+        },
+        REGISTER_MODAL(state, name) {
+            Vue.component(
+                name,
+                async () => import(`./components/modals/${name}`)
             );
         },
         LOCATION(state, view) {
