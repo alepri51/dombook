@@ -52,6 +52,10 @@
 </script>
 
 <style scoped>
+    .v-content {
+        height: 100vh; /* SET THIS FUCKING HEIGHT !!! */
+    }
+
     .loader-overlay::before {
         background-color: #212121;
     }
