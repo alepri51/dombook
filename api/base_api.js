@@ -39,8 +39,8 @@ class API {
                     let method = self.security(propKey, origMethod);
                     
                     return function (...args) {
-                        const result = method.apply(self, args);
-                        self.onExecuted && self.onExecuted(propKey, result);
+                        let result = method.apply(self, args);
+                        result = self.onExecuted ? self.onExecuted(propKey, result) : result;
                         return result;
                     };
                 }
@@ -92,7 +92,7 @@ class API {
     }
 
     signJWT(payload, private_key, options = {algorithm: 'RS256', expiresIn: '10s'}) {
-        console.log('IAT:', payload.iat);
+        //console.log('IAT:', payload.iat);
         delete payload.iat;
         delete payload.exp;
 

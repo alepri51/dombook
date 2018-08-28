@@ -24,6 +24,7 @@ export default {
     },
     watch: {
         'auth.signed': function(val, old) {
+            console.log('SIGN CHANGED from:', old, 'TO:', val);
             val === 1 && this.load();
         }
     }

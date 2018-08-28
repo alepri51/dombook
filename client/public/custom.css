@@ -1,3 +1,7 @@
+:root {
+    overflow: hidden;
+}
+
 :focus {
     outline: none!important;
 }

@@ -46,7 +46,7 @@ export default {
             return this.$store.state.entities;
         },
         auth() {
-            return this.state.auth;
+            return this.state.auth || {};
         },
         authenticated() {
             //debugger;

@@ -1,8 +1,6 @@
 <template>
-    <div class="widget">
-        <div class="slot">
-            <slot/>
-        </div>
+    <div class="widget" fill-height>
+        <slot/>
         <div style="position: absolute; bottom: 6px; right: 10px; font-size: 10px" class="grey--text">{{name}}</div>
     </div>
 </template>
@@ -20,14 +18,7 @@
 <style scoped>
     .widget {
         width: 100%;
-    }
-
-    .slot {
-        padding: 2px;        
-    }
-    .widget div:first-child {
         height: 100%;
     }
-
 </style>
 

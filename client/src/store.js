@@ -94,6 +94,8 @@ export default new Vuex.Store({
 
                 //оставшиеся данные
                 response.rest_data = { ...rest };
+
+                entities && this.commit('SET_ENTITIES', { entities, method: response.config.method });
                 
                 //SAVE CACHED STATE IF IS
                 response.data._cached = !!response.config.cache;

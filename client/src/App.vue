@@ -6,7 +6,7 @@
 
         <navigation :menu="$store.state.menu"/>
 
-        <v-content class="vcontent">
+        <v-content >
             <transition name="fade" mode="out-in">
                 <keep-alive>
                     <component :is="$store.state.view"></component>

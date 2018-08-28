@@ -12,8 +12,8 @@ let hash = value => {
 const mongoose = require('mongoose');
 const { Schema, Model } = mongoose;
 
-//const mongo_port = 32771;
-const mongo_port = 32774;
+const mongo_port = 32771;
+//const mongo_port = 32774;
 
 mongoose.connect(`mongodb://localhost:${mongo_port}/myapp`, {
     useNewUrlParser: true

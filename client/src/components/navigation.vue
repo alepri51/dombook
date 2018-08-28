@@ -1,19 +1,20 @@
 <template>
-  <v-toolbar app>
-    <v-icon large class="primary--text">fas fa-home</v-icon>
+  <v-toolbar app flat color="teal lighten-2">
+    <v-icon large color="white">fas fa-home</v-icon>
         
     <v-toolbar-title class="toolbar-title">
-      <span>ВСЕ</span>
-      <span class="secondary--text">Новостройки</span>
+      <span>Дом</span>
+      <span class="white--text">БУК</span>
     </v-toolbar-title>
 
     <v-tabs v-if="menu"
         class="ml-2"
         v-model="active"
         slider-color="secondary"
+        color="teal lighten-2"
     >
       <v-tab
-        class="primary--text"
+        class="white--text"
         v-for="item in menu"
         :key="item.to"
         ripple
@@ -28,22 +29,22 @@
     <v-spacer/>
 
     <v-toolbar-items v-if="!authenticated">
-        <v-btn flat @click="commit('SHOW_MODAL', { signup: void 0 })" color="primary">
+        <v-btn flat @click="commit('SHOW_MODAL', { signup: void 0 })" color="white">
             <v-icon small class="mr-1">far fa-user-circle</v-icon>РЕГИСТРАЦИЯ
         </v-btn>
 
-        <v-btn flat @click="commit('SHOW_MODAL', { signin: void 0 })" color="primary">
+        <v-btn flat @click="commit('SHOW_MODAL', { signin: void 0 })" color="white">
             <v-icon small class="mr-1">fas fa-sign-in-alt</v-icon>Войти
         </v-btn>
     </v-toolbar-items>
 
     <v-toolbar-items v-if="authenticated">
-        <v-btn flat replace to="account"  color="primary" >
+        <v-btn flat replace to="account"  color="white" >
             <v-icon small class="mr-1" :class="{ 'red--text': auth.signed !== 1 }">fas {{ auth.signed === 1 ? 'fa-user-circle' : 'fa-user-secret'}}</v-icon>
             {{ auth.email || 'Аноним' }}
         </v-btn>
 
-        <v-btn flat @click="commit('SHOW_MODAL', { signout: void 0 })" color="primary">
+        <v-btn flat @click="commit('SHOW_MODAL', { signout: void 0 })" color="white">
             Выход<v-icon small class="ml-1">fas fa-sign-out-alt</v-icon>
         </v-btn>
     </v-toolbar-items>
