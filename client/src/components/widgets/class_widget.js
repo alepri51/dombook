@@ -1,10 +1,10 @@
-import Base from './class_base';
-import widget from './widget';
+import Base from '../class_base';
+//import widget from './widgets/widget';
 
 export default {
     extends: Base,
     components: {
-        widget
+        widget: () => import('./widget')
     },
     async created() {
         this.load();

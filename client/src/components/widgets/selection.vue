@@ -1,7 +1,10 @@
 <template>
     <widget name="scroll" wrap>
         <div slot="header">HELLO</div>
-        <v-flex v-for="n in 101" :key="n" v-scroll:#scroll-target="onScroll">
+        
+        
+        
+        <v-flex v-for="n in 101" :key="n" >
             <v-card color="blue-grey darken-2" class="white--text" :width="200" hover>
               <v-card-title primary-title>
                 <div class="headline">Unlimited music now</div>
@@ -16,14 +19,17 @@
 </template>
 
 <script>
-    import Widget from '../components/class_widget';
+    import Widget from './class_widget';
+    //debugger;
+    //console.log(SuiVue);
     
     export default {
         extends: Widget,
+        
         methods: {
             onScroll() {
                 //this.offsetTop = e.target.scrollTop
-                console.log('SCROLLING')
+                console.log('SCROLLING');
             }
         }
     }

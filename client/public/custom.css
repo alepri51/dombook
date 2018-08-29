@@ -14,10 +14,19 @@
 
 ::-webkit-scrollbar-track {
     background-color: #F5F5F5;
+    border-radius: 5px;
+}
+
+body ::-webkit-scrollbar-track {
+    border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: #9E9E9E;
+    cursor: pointer;
+    border-radius: 5px;
+    background: rgba(0,0,0,.25);
+    -webkit-transition: color .2s ease;
+    transition: color .2s ease;
 }
 
 .input-group.input-group--error label {
@@ -31,4 +40,12 @@
 .shadow {
     -webkit-filter: drop-shadow(2px 2px 2px #ccc);
     filter: drop-shadow(2px 2px 2px #ccc);
+}
+
+*:not(i) {
+    font-family: 'Roboto Condensed'!important;
+}
+
+.application, .application .display-2 {
+    font-family: 'Roboto Condensed'!important;
 }

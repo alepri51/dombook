@@ -1,5 +1,5 @@
 <template>
-    <dashboard v-if="true"  :layout="layout" :components="components" @REGISTER-COMPONENT="registerComponent"/>
+    <dashboard v-if="true"  :layout="layout" :components="components" :data="{}" @REGISTER-COMPONENT="registerComponent"/>
     <div v-else>
         ДОСТУП ЗАКРЫТ
     </div>
@@ -25,8 +25,16 @@
                         "x": 1,
                         "y": 0,
                         "w": 6,
-                        "h": 15,
-                        "text": "news",
+                        "h": 2,
+                        "available": false,
+                        "comp": "selection"
+                    },
+                    {
+                        "id": 2,
+                        "x": 1,
+                        "y": 2,
+                        "w": 6,
+                        "h": 13,
                         "available": false,
                         "comp": "scroll"
                     },
@@ -36,7 +44,6 @@
                         "y": 0,
                         "w": 2,
                         "h": 9,
-                        "text": "bio",
                         "available": false,
                         "comp": "calendar"
                     },
@@ -46,7 +53,6 @@
                         "y": 9,
                         "w": 2,
                         "h": 6,
-                        "text": "bio",
                         "available": false,
                         "comp": "scroll"
                     }

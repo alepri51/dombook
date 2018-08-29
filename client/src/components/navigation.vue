@@ -1,5 +1,5 @@
 <template>
-  <v-toolbar app flat color="teal lighten-2">
+  <v-toolbar app fixed flat color="primary">
     <v-icon large color="white">fas fa-home</v-icon>
         
     <v-toolbar-title class="toolbar-title">
@@ -10,8 +10,8 @@
     <v-tabs v-if="menu"
         class="ml-2"
         v-model="active"
-        slider-color="secondary"
-        color="teal lighten-2"
+        slider-color="accent"
+        color="primary"
     >
       <v-tab
         class="white--text"

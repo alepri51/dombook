@@ -8,8 +8,8 @@
                     <!-- <v-divider/> -->
                 </slot>
     
-                <v-layout class="content" v-bind="$attrs" id="scroll-target" >
-                    <slot v-scroll:#scroll-target="onScroll"/>
+                <v-layout class="content" v-bind="$attrs" id="scroll" @scroll="onScroll">
+                    <slot/>
                 </v-layout>
             </v-layout>
         </v-container>
@@ -18,14 +18,18 @@
 </template>
 
 <script>
-    import Base from './class_base';
-
     export default {
         props: ['name'],
+        data: () => ({
+            scroll: 0
+        }),
+        activated() {
+            let element = this.$el.querySelector('#scroll');
+            element.scrollTop = this.scroll;
+        },
         methods: {
-            onScroll() {
-                //this.offsetTop = e.target.scrollTop
-                console.log('SCROLLING')
+            onScroll(e) {
+                this.scroll = e.target.scrollTop;
             }
         }
     }

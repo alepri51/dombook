@@ -120,10 +120,13 @@
         }
     }
 
-    .application, .application .display-2 {
+    /* body {
         font-family: 'Roboto Condensed'!important;
     }
-
+    .application, .application .display-2 {
+        font-family: 'Roboto Condensed'!important;
+    } */
+/*
     .brand-logo {
         font-family: 'Roboto Condensed', serif;
         font-size: 36px!important;
@@ -155,6 +158,6 @@
     }
     .brand-text {
         font-weight: bold;
-    }
+    } */
 
 </style>

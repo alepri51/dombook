@@ -125,11 +125,13 @@ export default new Vuex.Store({
             );
         },
         REGISTER_COMPONENT(state, name) {
+            //debugger
             Vue.component(
                 name,
                 async () => import(`./components/${name}`).catch((err) => {
-                    console.error(err);
-                    return import(`./components/stub`);
+                    return import(`./components/widgets/${name}`).catch((err) => {
+                        return import(`./components/stub`);
+                    })
                 })
             );
         },

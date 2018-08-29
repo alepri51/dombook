@@ -1,11 +1,6 @@
-import Widget from './class_widget';
+import Widget from './widgets/class_widget';
 
 export default {
-    extends: Widget,
-    methods: {
-        registerComponent(name) {
-            this.commit('REGISTER_COMPONENT', name);
-        }
-    }
+    extends: Widget
 }
 
