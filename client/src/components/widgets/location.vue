@@ -1,11 +1,11 @@
 <template>
     <widget name="" class="elevation-0">
-        <div slot="header1">
-            КАРТА
+        <div slot="header">
+            ИНФРАСТРУКТУРА
         </div>
 
-        <yandex-map 
-            :coords="[54.62896654088406, 39.731893822753904]"
+        <yandex-map ref="content"
+            :coords="[55.749706, 37.598517]"
             zoom="10"
             
             :cluster-options="{
@@ -36,7 +36,7 @@
             return {
                 placemarks: [
                     {
-                        coords: [54.8, 39.8],
+                        coords: [55.749706, 37.598517],
                         properties: {}, // define properties here
                         options: {}, // define options here
                         clusterName: "1",
@@ -47,7 +47,10 @@
         },
         methods: {
             initHandler() {
-
+                this.$refs.content.myMap.options.set({
+                    suppressMapOpenBlock: true,
+                    autoFitToViewport: 'always'
+                });
             }
         }
     }
