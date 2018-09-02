@@ -1,6 +1,6 @@
 <template>
     <v-card class="widget" fill-height tile v-bind="$attrs">
-        <v-container fluid grid-list-lg fill-height>
+        <v-container fluid grid-list-xs fill-height >
             <v-layout column>
                 <div>
                     <slot name="header"/>
