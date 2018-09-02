@@ -34,7 +34,7 @@ Model.prototype.projection = function() {
     return projection;
 };
 
-let User = mongoose.model('User', new Schema({ 
+const User = mongoose.model('User', new Schema({ 
     name: {
         type: String,
         select: true
@@ -45,6 +45,40 @@ let User = mongoose.model('User', new Schema({
         private_key: String,
         public_key: String
     })
+}));
+
+const Project = mongoose.model('Project', new Schema({ 
+    name: {
+        type: String,
+        select: true
+    },
+    buildings: [{ type: Schema.Types.ObjectId, ref: 'Building' }]
+}));
+
+const Building = mongoose.model('Building', new Schema({ 
+    name: {
+        type: String,
+        select: true
+    },
+    project: { type: Schema.Types.ObjectId, ref: 'Project' },
+    lots: [{ type: Schema.Types.ObjectId, ref: 'Lot' }],
+    seller: { type: Schema.Types.ObjectId, ref: 'Seller' }
+}));
+
+const Lot = mongoose.model('Lot', new Schema({ 
+    name: {
+        type: String,
+        select: true
+    },
+    building: { type: Schema.Types.ObjectId, ref: 'Building' }
+}));
+
+const Seller = mongoose.model('Seller', new Schema({ 
+    name: {
+        type: String,
+        select: true
+    },
+    building: { type: Schema.Types.ObjectId, ref: 'Building' }
 }));
 
 //////////////////////////MODELS//////////////////////////////////////
@@ -113,5 +147,9 @@ async function getAccountPrivateKey(id) {
 module.exports = {
     getAccountPrivateKey,
     normalize,
-    User
+    User,
+    Project,
+    Building,
+    Lot,
+    Seller
 }
