@@ -1,6 +1,6 @@
 'use strict'
 
-const db = require('./db');
+const db = require('./models');
 const { Unknown } = require('./api/base_api');
 const auth = require('./api/auth_api');
 const project = require('./api/project_api');

@@ -1,69 +1,42 @@
 <template>
-    <widget name="scroll" wrap>
+    <widget name="" wrap justify-center flat :height="'50vh'">
         <div slot="header">
             <v-layout justify-center class="ma-2">
-                <h2 size="medium">YOUTUBE</h2>
+                <h2 size="medium">РЕКОМЕНДУЕМ</h2>
             </v-layout>   
             <div>
-                <sui-dropdown class="ui floating labeled icon dropdown button">
-                    <i class="filter icon"></i>
-                    <span class="text">Filter</span>
-                    <sui-menu>
-                        <div class="header">
-                        Search Issues
-                        </div>
-                        <div class="ui left icon input">
-                        <i class="search icon"></i>
-                        <input type="text" name="search" placeholder="Search...">
-                        </div>
-                        <div class="header">
-                        <i class="tags icon"></i>
-                        Filter by tag
-                        </div>
-                        <div class="item">
-                        <div class="ui red empty circular label"></div>
-                        Important
-                        </div>
-                        <div class="item">
-                        <div class="ui blue empty circular label"></div>
-                        Announcement
-                        </div>
-                        <div class="item">
-                        <div class="ui black empty circular label"></div>
-                        Discussion
-                        </div>
-                    </sui-menu>
-                    </sui-dropdown>
+                
 
             </div>    
         </div>
-        
-        <v-flex v-for="n in 101" :key="n" >
-            <!-- <sui-image :src="`https://placeimg.com/300/${200 + n}/nature`" /> -->
-            <!-- <sui-card>
-                
+        <v-divider slot="divider" class="mb-4"/>
+        <v-flex v-for="n in 4" :key="n" style="max-width: 250px">
+            <v-card color="blue-grey darken-2" class="white--text" :width="200" hover>
+            <sui-card>
                 <sui-embed
-                
-                icon="far fa-eye"
-                id="90Omh7_I8vI"
-                :placeholder="`https://placeimg.com/300/${200 + n}/nature`"
-                source="youtube"
+                    icon="fas fa-film embed-icon"
+                    id="90Omh7_I8vI"
+                    :placeholder="`https://placeimg.com/300/${200 + n}/nature`"
+                    source="youtube"
+                    :iframe="{allowFullScreen: true }"
                 />
+                <!-- <sui-image src="static/images/avatar/large/matthew.png" /> -->
                 <sui-card-content>
-                    <sui-card-header>Kristy</sui-card-header>
-                    <sui-card-meta>Joined in 2013</sui-card-meta>
-                    <sui-card-description>Kristy is an art director living in New York.</sui-card-description>
-                    <sui-rating icon="star" :max-rating="5" :rating="rating" @rate="rating = arguments[1].rating"/>
+                <sui-card-header>Matt Giampietro</sui-card-header>
+                <sui-card-meta>Friends</sui-card-meta>
+                <sui-card-description>
+                    Matthew is an interior designer living in New York.
+                </sui-card-description>
                 </sui-card-content>
                 <sui-card-content extra>
-                    <sui-icon name="user" />
-                    22 Friends
+                <sui-icon name="user" /> 75 Friends
+                <span slot="right">Joined in 2013</span>
                 </sui-card-content>
-                
-            </sui-card> -->
-            <v-card color="blue-grey darken-2" class="white--text" :width="200" hover>
+            </sui-card>
+            </v-card>
+            <!-- <v-card color="blue-grey darken-2" class="white--text" :width="200" hover>
                 <sui-embed
-                    icon="fas fa-eye embed-icon"
+                    icon="fas fa-film embed-icon"
                     id="90Omh7_I8vI"
                     :placeholder="`https://placeimg.com/300/${200 + n}/nature`"
                     source="youtube"
@@ -77,7 +50,7 @@
               <v-card-actions>
                 <v-btn flat dark>Listen now</v-btn>
               </v-card-actions>
-            </v-card>
+            </v-card> -->
         </v-flex>
     </widget>
 </template>
@@ -100,7 +73,7 @@
 </script>
 
 
-<style>
+<style scoped>
     .v-card, .ui.card {
         margin: auto;
     }

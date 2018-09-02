@@ -9,15 +9,46 @@ router.use(express.urlencoded({extended: false}));
 
 let types = require('./api');
 
-let patterns = ['/:type\::id\.:action', '/:type\.:action', '/:type\::id', '/:type'];
+/////////////////////////////////////////////////////////////////////////////////////////////
+const fs = require('fs-extra');
+const path = require('path');
 
+const multer  = require('multer');
+
+const storage = multer.memoryStorage();
+const blobUpload = multer({ 
+    storage,
+    limits: {
+        fileSize: 1024 * 6024
+    }
+});
+
+let multipartDetector = function(req, res, next) {
+    if(req.object.auth && req.headers['content-type'] && req.headers['content-type'].indexOf('multipart/form-data') !== -1) {
+        
+        let none = blobUpload.any();
+        none(req, res, (err) => {
+            req.blob = {
+                err,
+                files: req.files
+            }
+
+            next();
+        });
+    }
+    else next();
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+let patterns = ['/:type\::id\.:action', '/:type\.:action', '/:type\::id', '/:type'];
 
 let processToken = function(req, res, next) {
     let { type, id, action } = req.params;
 
-    console.log('---------------BEGIN-----------------');
+    /* console.log('---------------BEGIN-----------------');
     console.log('REQUEST:', req.path);
-    console.log('---------------BEGIN-----------------');
+    console.log('---------------BEGIN-----------------'); */
 
     type = type.toLowerCase();
     !types[type] && (type = 'unknown');
@@ -38,29 +69,33 @@ let proccedRequest = async function(req, res) {
     if(!object.error) {
         !object[action] && (action = 'default');
 
-        let executor = action ? object[action].bind(object) : object.default.bind(object);
+        //let executor = action ? object[action].bind(object) : object.default.bind(object);
+        //let executor = object[action].bind(object);
 
         let params = Object.keys(req.body).length === 0 ? req.query : req.body;
-        result = await executor(params, req, res);
+        result = await object[action].call(object, params, req, res); //executor(params, req, res);
 
         await object.refreshJWT(); //DO NOT REMOVE
     }
 
     let { token, auth, error } = object;
 
-    console.log('----------------END------------------');
+    /* console.log('----------------END------------------');
     console.log('RESPONSE:', req.path);
     console.log('RESULT:', result);
-    console.log('----------------END------------------');
+    console.log('----------------END------------------'); */
 
     return { token, auth, error, ...result };
 };
 
 let io = void 0;
 
-router.all(patterns, processToken, async (req, res, next) => {
+router.all(patterns, processToken, multipartDetector, async (req, res, next) => {
     try {
         let response = await proccedRequest(req, res);
+
+        //console.log(req.path, response);
+
         res.json(response).end();
     }
     catch(err) {

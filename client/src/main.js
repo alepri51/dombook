@@ -7,20 +7,28 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 
-import 'vuetify/dist/vuetify.min.css';
 import 'semantic-ui-css/semantic.min.css';
+import 'vuetify/dist/vuetify.min.css';
 
 import './../public/custom.css';
 
+Vue.use(SuiVue);
+
 Vue.use(Vuetify, {
     theme: {
-        primary: colors.blueGrey.darken2,
-        accent: colors.amber.darken2,
-        secondary: colors.green.darken2,
-        'primary-light': '#F5F5F5',
-        error: colors.red.darken2,
-        inactive: colors.blueGrey.base,
-        'default-action': colors.green.darken2
+        primary: colors.teal.darken1,
+        secondary: colors.cyan.darken1,
+        accent: colors.deepOrange.base,
+        error: colors.red.accent4,
+        warning: colors.yellow.accent4,
+        info: colors.lightBlue.accent4,
+        success: colors.green.darken2,
+
+        background: '#f5f5f5',
+        unimportant: colors.blueGrey.base,
+        transparent: colors.teal.lighten5,
+        scroll: colors.cyan.lighten4,
+        scrollColor: colors.cyan.lighten3,
     }
 });
 
@@ -28,10 +36,9 @@ Vue.config.productionTip = false;
 
 Vue.prototype.$colors = colors;
 
-Vue.use(SuiVue);
-
 new Vue({
     router,
     store,
+    
     render: h => h(App)
 }).$mount('#app');

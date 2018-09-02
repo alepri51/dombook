@@ -12,6 +12,8 @@
   "dependencies": {
     "axios": "^0.18.0",
     "bcryptjs": "^2.4.3",
+    "bitcoin-core": "^2.0.0",
+    "compress-images": "^1.4.0",
     "compression": "^1.7.3",
     "connect-history-api-fallback": "^1.5.0",
     "cors": "^2.8.4",
@@ -22,8 +24,12 @@
     "jsonwebtoken": "^8.3.0",
     "md5": "^2.2.1",
     "mongoose": "^5.2.9",
+    "multer": "^1.3.1",
     "nanoid": "^1.2.1",
     "normalizr": "^3.2.4",
+    "request-promise": "^4.2.2",
+    "seraph": "^0.15.3",
+    "seraph-model": "^0.10.1",
     "socket.io": "^2.1.1",
     "ua-parser-js": "^0.7.18"
   }

@@ -1,71 +1,10 @@
 'use strict';
 
-const normalizer = require('normalizr');
+const { normalize } = require('../models');
+const { Model, DBAccess } = require('./db_api');
+const { API, SecuredAPI } = require('./base_api');
+const db = require('../models');
 
-const { SecuredAPI } = require('./base_api');
-const db = require('../db');
-let { User } = db;
-
-class Model extends SecuredAPI {
-    constructor(...args) {
-        super(...args);
-
-        this.error = void 0;
-    }
-
-    model(data = {}) {
-        if(Object.keys(data).length) {
-            data.api = data.api || 'v1';
-            const schema = normalizer.schema;
-
-            const _reply = new schema.Entity('reply', {});
-
-            const _questionnaire = new schema.Entity('questionnaire', {
-                replies: [_reply]
-            });
-
-            _reply.define({ questionnaire: [_questionnaire] });
-
-            const _account = new schema.Entity('account', {});
-
-            const _user = new schema.Entity('user', {
-                account: _account
-            });
-
-            const _filter = new schema.Entity('filter', {});
-
-            const _home = new schema.Entity('home', {
-                filters: [_filter]
-            });
-
-            const db = new schema.Entity('database', {
-                user: _user,
-                questionnaire: [_questionnaire],
-                //account: _member,
-                //auth: _auth,
-                //error: _error,
-                //defaults: {_defaults}
-               home: _home
-            }, { 
-                idAttribute: 'api'
-            });
-
-            let normalized = normalizer.normalize(data, db);
-            normalized = { ...normalized, entry: 'database' };
-
-            return normalized;
-        }
-        else return data;
-    }
-
-    onExecuted(name, result) {
-        if(typeof result === 'object' && Object.keys(result).length) {
-            return this.model(result);
-        }
-    }
-
-    
-}
 
 class Home extends Model {
     constructor(...args) {

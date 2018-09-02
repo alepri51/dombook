@@ -62,11 +62,17 @@ export default {
 	created() {
         this.calc();
         this.components.forEach(element => {
-            //this.commit('REGISTER_COMPONENT', element.comp);
             this.$emit('REGISTER-COMPONENT', element.comp);
         });
 	},
-
+    watch: {
+        'components': function() {
+            //debugger
+            this.components.forEach(element => {
+                this.$emit('REGISTER-COMPONENT', element.comp);
+            });
+        }
+    },
 	methods: {
 		calc() {
 			this.v = 100 / this.layout.rows

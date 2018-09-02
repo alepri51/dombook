@@ -1,10 +1,10 @@
 <template>
-    <v-app>
+    <v-app :style="cssProps">
         <div class="loader-overlay" v-if="$store.state.loading">
             <div style="" class="spinner spinner--circle-4"></div>
         </div>
 
-        <navigation :menu="$store.state.menu"/>
+        <!-- <navigation :menu="$store.state.menu"/> -->
 
         <v-content >
             <transition name="fade" mode="out-in">
@@ -35,6 +35,9 @@
                 {{ $store.state.snackbar.caption }}
             </v-btn>
         </v-snackbar>
+
+        <!-- <news/>
+        <manual/> -->
     </v-app>
 </template>
 
@@ -44,10 +47,21 @@
         name: 'App',
         components: {
             navigation: () => import('./components/navigation'),
-            /* signin: () => import('./components/modals/signin'),
-            signup: () => import('./components/modals/signup'),
-            signout: () => import('./components/modals/signout') */
-        }
+            /* news: () => import('./components/modals/news'),
+            manual: () => import('./components/modals/manual') */
+        },
+        computed: {
+            cssProps() {
+                debugger
+                return {
+                    '--scroll-background': this.$colors.shades.transparent,
+                    '--scroll-color': this.$vuetify.theme.scrollColor,
+                    '--embed-icon-color': this.$colors.shades.white,
+                    '--editor-button-color': this.$vuetify.theme.secondary,
+                    '--primary-color': this.$vuetify.theme.primary,
+                }
+            }
+        },
     }
 </script>
 

@@ -2,8 +2,8 @@
     <v-dialog v-model="visible" persistent max-width="500px">
         <v-card>
             <v-card-title>
-                <v-icon class="mr-1 primary--text">fas fa-user-circle</v-icon>
-                <span class="headline primary--text">Аутентификация</span>
+                <v-icon class="mr-1 primary--text shadow">fas fa-sign-in-alt</v-icon>
+                <span class="headline primary--text">Вход</span>
             </v-card-title>
             <v-card-text>
                 <v-card-text>
@@ -33,10 +33,10 @@
                 </v-card-text>
             </v-card-text>
             <v-card-actions>
-                <v-btn color="inactive" flat @click.native="commit('HIDE_MODAL', { signin: void 0 })">Вспомнить пароль</v-btn>
+                <v-btn color="unimportant" flat @click.native="commit('HIDE_MODAL', { signin: void 0 })">Вспомнить пароль</v-btn>
                 <v-spacer></v-spacer>
-                <v-btn color="inactive" flat @click.native="commit('HIDE_MODAL', { signin: void 0 })">Не входить</v-btn>
-                <v-btn dark class="default-action" flat @click.native="submit">Войти</v-btn>
+                <v-btn color="unimportant" flat @click.native="commit('HIDE_MODAL', { signin: void 0 })">Не входить</v-btn>
+                <v-btn dark color="secondary" @click.native="submit">Войти</v-btn>
             </v-card-actions>
 
         </v-card>
@@ -45,7 +45,7 @@
 </template>
 
 <script>
-    import Modal from '../class_modal';
+    import Modal from './class_modal';
     
     export default {
         extends: Modal,
@@ -55,14 +55,12 @@
                 email: 'ya@ya.ru',
                 password: '123'
 
-                /* email: 'club@atlant.club',
-                password: 'DerGfhjkm100' */
             }
         },
         methods: {
             submit() {
                 //this.$refs.form.validate() && this.$store.actions.signin({ email: this.email, password: this.password });'
-                //debugger;
+                debugger;
                 this.$refs.form.validate() ? 
                     this.execute({ 
                         method: 'post', 
@@ -70,12 +68,13 @@
                         payload: this.$data, 
                         callback: (response) => {
                             if(!response.error) {
+                                //this.commit('RESET_CACHE');
                                 this.commit('HIDE_MODAL', { signin: void 0 });
                                 
                                 //this.state.view !== 'newslayout' ? this.state.signed_in ? this.commit('LOCATION', this.state.view) : this.$router.replace('newslayout') : this.commit('LOCATION', 'newslayout');
                                 //debugger;
                                 //this.state.signed_in ? this.commit('LOCATION', this.state.view) : this.$router.replace('newslayout');
-                                this.state.view === 'landing' ? this.$router.replace('home') : this.commit('LOCATION', this.state.view);
+                                //this.state.view === 'landing' ? this.$router.replace('newslayout') : this.commit('LOCATION', this.state.view);
                             }
                         }
                     })

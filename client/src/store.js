@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import io from 'socket.io-client';
 
-const BASE_URL = 'https://localhost:8001';
+const BASE_URL = 'https://localhost:8000';
 
 //debugger;
 const socket = io(BASE_URL);
@@ -23,6 +23,7 @@ import { cacheAdapterEnhancer, throttleAdapterEnhancer, Cache } from 'axios-exte
 
 Vue.use(Vuex);
 
+const CancelToken = axios.CancelToken;
 let requests_cache = new Cache();
 let api = void 0;
 
@@ -48,18 +49,19 @@ export default new Vuex.Store({
         },
 
         menu: [
-            {
-                name: 'landing',
-                to: 'landing'
-            }
         ],
-        notFound: false
+        notFound: false,
+        path_query: {},
+        route: {},
+        registered_modals: {}
     },
     mutations: {
         RESET_ENTITIES(state) {
             state.entities = {}
         },
         RESET_CACHE(state) {
+            console.log('RESET', state.auth ? state.auth.signed : 'NULL');
+            //console.log('RESET', state.auth.signed);
             requests_cache.reset();
         },
         INIT(state, view) {
@@ -73,8 +75,17 @@ export default new Vuex.Store({
 
             state.token = sessionStorage.getItem('token');
 
+            let activeRequests = [];
+
             let onRequest = (config => {
+                console.log('request', config.url, requests_cache.length);
                 state.token && (config.headers.common.authorization = state.token);
+
+                /* config.cancelToken = new CancelToken(function executor(cancel) {
+                    // An executor function receives a cancel function as a parameter
+                    activeRequests.push(cancel);
+                }); */
+
                 return config;
             });
 
@@ -82,24 +93,52 @@ export default new Vuex.Store({
 
                 let {token, auth, error, entities, _cached, ...rest} = response.data;
 
-                //token MUST EXISTS!
-                this.commit('SET_TOKEN', token);
-                this.commit('SET_AUTH', auth);
+                error && (!error.system ? this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` }) : console.error(`ОШИБКА: ${error.message}`));
 
-                error && !error.system && this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` });
-                //commit('REGISTER_MODAL', 'signin');
-                error && !error.system && auth.signed !== 1 && this.commit('SHOW_MODAL', { signin: void 0 });
+                if(error && error.code === 403 && !error.system && auth.signed !== 1) {
+                    console.log('SIGN IN SHOW');
+                    this.commit('SHOW_MODAL', { signin: void 0 });
+                }
 
                 response.error = error; //DO NOT REMOVE
-
-                //оставшиеся данные
-                response.rest_data = { ...rest };
-
-                entities && this.commit('SET_ENTITIES', { entities, method: response.config.method });
                 
-                //SAVE CACHED STATE IF IS
-                response.data._cached = !!response.config.cache;
+                if(!token) {
+                    this.commit('RESET_CACHE');
+                    this.commit('RESET_ENTITIES');
+                    !error && this.dispatch('execute', { cache: false, endpoint: 'signup.silent'});
+                }
+                else {
 
+                    if(!state.auth || (state.auth && auth.signed !== state.auth.signed)) {
+                        this.commit('RESET_CACHE');
+                        auth.signed === 0 && this.commit('RESET_ENTITIES');
+                    }
+                    else {
+                    }
+
+                    if(!_cached) {
+                        this.commit('SET_TOKEN', token);
+                        this.commit('SET_AUTH', auth);
+                        /* error && !error.system && this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` });
+
+                        if(error && error.code === 403 && !error.system && auth.signed !== 1) {
+                            console.log('SIGN IN SHOW');
+                            this.commit('SHOW_MODAL', { signin: void 0 });
+                        }
+
+                        response.error = error; //DO NOT REMOVE */
+
+                        response.rest = rest && Object.keys(rest).length ? { ...rest } : void 0;
+                        response.entities = entities;
+
+                        entities && this.commit('SET_ENTITIES', { entities, method: response.config.method });
+
+                    }
+
+                    
+            }
+
+                response.data._cached = !!response.config.cache;
                 return response;
             });
 
@@ -116,10 +155,10 @@ export default new Vuex.Store({
         LOADING(state, value) {
             state.loading = value;
         },
-        REGISTER_VIEW(state, name) {
+        REGISTER_VIEW(state, { name, view }) {
             Vue.component(
                 name,
-                async () => import(`./views/${name}`).catch(() => {
+                async () => import(`./views/${view}`).catch(() => {
                     return import(`./views/not-found`);
                 })
             );
@@ -136,10 +175,22 @@ export default new Vuex.Store({
             );
         },
         REGISTER_MODAL(state, name) {
-            Vue.component(
-                name,
-                async () => import(`./components/modals/${name}`)
-            );
+            if(!state.registered_modals[name]) {
+                state.registered_modals[name] = true;
+
+                Vue.component(
+                    name,
+                    async () => import(`./components/modals/${name}`)
+                );
+            }
+        },
+        SET_PATH_QUERY(state, query) {
+            state.path_query = query;
+        },
+        SET_ROUTE(state, route) {
+            //debugger
+            route.id = route.id && parseInt(route.id);
+            state.route = route;
         },
         LOCATION(state, view) {
             state.view = view;
@@ -150,11 +201,13 @@ export default new Vuex.Store({
         },
         SHOW_MODAL(state, params) {
 
-            let [name] = Object.keys(params);
+            if(!state.modals[name]) {
+                let [name] = Object.keys(params);
 
-            let [ data = {}, options ] = Object.values(params);
-            
-            Vue.set(state.modals, name, { data, options } || {});
+                let [ data = {}, options ] = Object.values(params);
+                
+                Vue.set(state.modals, name, { data, options } || {});
+            }
         },
         HIDE_MODAL(state, params) {
             let name = Object.keys(params)[0];
@@ -173,6 +226,7 @@ export default new Vuex.Store({
         },
         SET_AUTH(state, auth) {
             state.auth = auth;
+            this.commit('HIDE_SNACKBAR');
         },
         SHOW_SNACKBAR(state, options) {
             state.snackbar.visible = true;
@@ -182,8 +236,18 @@ export default new Vuex.Store({
         HIDE_SNACKBAR(state) {
             state.snackbar.visible = false;
         },
-        SET_ENTITIES(state, { entities, map, result, entry, method }) {
+        MUTATE_ENTITY(state, payload) {
+            let { entities, entity, id, deleted } = payload;
             if(entities) {
+                if(id) {
+                    entities[entity] && entities[entity][id] && deleted ? Vue.delete(state.entities[entity], id) : Vue.set(state.entities[entity], id, entities[entity][id]);
+                    !deleted && this.commit('SET_ENTITIES', { entities, method: 'GET' });
+                }
+                else this.commit('SET_ENTITIES', { entities, method: 'GET' });
+            }
+        },
+        SET_ENTITIES(state, { entities, map, result, entry, method }) {
+            if(entities && method.toUpperCase() === 'GET') {
                 //debugger;
                 let merge = Object.keys(entities).length ? deepmerge(state.entities, entities || {}, {
                     arrayMerge: function (destination, source, options) {
@@ -214,7 +278,7 @@ export default new Vuex.Store({
     },
     actions: {
         async execute({ commit, state }, { cache = true, method, endpoint, payload, headers, callback }) {
-            console.log('REQUEST:', endpoint);
+            //console.log('REQUEST:', endpoint);
 
             let response;
 
@@ -227,9 +291,10 @@ export default new Vuex.Store({
             };
 
             config.cache = config.method === 'get' ? cache ? requests_cache : false : false;
-
+            //config.cache = false;
             commit('LOADING', true);
 
+            console.log('EXECUTE:', endpoint, 'CACHE', !!config.cache);
             try {
 
                 config.method === 'get' ? config.params = payload : config.data = payload;

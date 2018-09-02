@@ -6,15 +6,21 @@ export default {
     components: {
         widget: () => import('./widget')
     },
-    async created() {
+    activated() {
+        console.log('activated', this.entity);
         this.load();
     },
     methods: {
         load() {
-            this.execute({ endpoint: this.entity, method: 'get' });
+            //debugger;
+
+            this.execute({ endpoint: this.endpoint, method: 'get' });
         }
     },
     computed: {
+        endpoint() {
+            return `${this.entity}${ this.component_id ? ':' + this.component_id : '' }`;
+        },
         raw_data() {
             return this.$store.state.entities[this.entity] ? Object.values(this.$store.state.entities[this.entity]) : [];
         },
@@ -25,7 +31,8 @@ export default {
     watch: {
         'auth.signed': function(val, old) {
             console.log('SIGN CHANGED from:', old, 'TO:', val);
-            val === 1 && this.load();
+            //val < old && this.load();
+            val && this.load();
         }
     }
 }

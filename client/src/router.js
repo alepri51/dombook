@@ -16,13 +16,21 @@ let router = new Router({
 });
 
 router.beforeEach(async (to, from, next) => {
-    let name = to.path.slice(1);
+    store.commit('HIDE_MODALS');
     
-    store.commit('INIT', name);
-    !store.state.token && await store.dispatch('execute', { cache: false, endpoint: 'signup.silent'});
+    let name = to.path.slice(1);
+    to.query && store.commit('SET_PATH_QUERY', to.query);
+    //debugger
+    let [component, rest = ''] = name.split(':');
+    let [id, action] = rest.split('.');
+    let view = `${component}${ id ? '_' + id : ''}`;
 
-    store.commit('REGISTER_VIEW', name);
-    store.commit('LOCATION', name);
+    store.commit('SET_ROUTE', { component, id, action, view });
+    store.commit('INIT', name);
+    //!store.state.token && await store.dispatch('execute', { cache: false, endpoint: 'signup.silent'});
+
+    store.commit('REGISTER_VIEW', { name: view, view: component });
+    store.commit('LOCATION', view);
 
     next();
 });

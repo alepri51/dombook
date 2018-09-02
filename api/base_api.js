@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto2');
 
 
-const { User } = require('../db');
+const { getAccountPrivateKey } = require('../models');
 
 let KEYS_CACHE = {};
 
@@ -26,10 +26,9 @@ class API {
 
         this.error = void 0;
 
-        token && (this.payload = this.verifyJWT(this.token));
-    
-
         let self = this;
+
+        this.payload = token ? this.verifyJWT(this.token) : void 0;
 
         const handler = {
             get(target, propKey, receiver) {
@@ -38,11 +37,19 @@ class API {
 
                     let method = self.security(propKey, origMethod);
                     
-                    return function (...args) {
-                        let result = method.apply(self, args);
+                    return async function (...args) {
+                        let result = await method.apply(self, args);
                         result = self.onExecuted ? self.onExecuted(propKey, result) : result;
+                        //console.log('CALLED:', self.class_name, propKey, self.onExecuted ? 'EXECUTED' : 'NO INERSEPTOR');
+                        //console.log('CALLED:', result);
                         return result;
                     };
+                    /* return function (...args) {
+                        let result = method.apply(self, args);
+                        result = self.onExecuted ? self.onExecuted(propKey, result) : result;
+                        console.log('CALLED:', self.class_name, propKey, self.onExecuted ? 'EXECUTED' : 'NO INERSEPTOR');
+                        return result;
+                    }; */
                 }
                 else return origMethod;
             }
@@ -52,7 +59,7 @@ class API {
     }
 
     get auth() {
-        return this.payload && this.payload.auth;
+        return (this.payload && this.payload.auth);
     }
 
     get class_name() {
@@ -62,18 +69,6 @@ class API {
     security(name, method) {
         return method;
     }
-
-    /* generateError({ code, message, data, system }) {
-        let error = this.error;
-        //data = data || this.error.data;
-        this.error = new APIError(code, message);
-        this.error.class = this.class_name;
-        this.error.data = data;
-        this.error.history = this.error.history || [];
-        error && this.error.history.push(error);
-
-        this.error.system = system;
-    } */
 
     hash(value) {
         let salt = bcrypt.genSaltSync(10);
@@ -114,16 +109,19 @@ class API {
             this.error = err;
              
             if(err.name === 'TokenExpiredError') {
+                this.error.class_name = this.class_name;
                 this.error.expired = true;
                 this.error.system = true;
 
-                payload.auth.signed === 1 ? payload.auth.signed = 2 : payload.auth.signed = 0;
+                //payload.auth.signed === 1 ? payload.auth.signed = 2 : payload.auth.signed = 0;
+                payload.auth.signed === 1 && (payload.auth.signed = 2);
                 return payload;
             }
         };
     }
 
     async refreshJWT() {
+        //return this.payload;
         let payload = this.payload;
         if(payload) {
             //REFRESH TOKEN
@@ -132,9 +130,7 @@ class API {
             payload.insecure && (private_key = payload.key);
 
             if(!private_key) {
-                let user = await User.findOne({ _id: payload.id });
-
-                private_key = user.account.private_key;
+                private_key = await getAccountPrivateKey(payload.id);
                 KEYS_CACHE[payload.id] = private_key;
             }
 
@@ -150,6 +146,10 @@ class API {
     default(params) {
         return { params }
     }
+
+    defaults() {
+        return {empty: true}
+    }
 };
 
 class Unknown extends API {
@@ -157,17 +157,60 @@ class Unknown extends API {
         super(...args);
     }
 
-    async defaults() {
+    /* async defaults() {
         return {empty: true}
-    }
+    } */
 }
 
 class SecuredAPI extends API {
     constructor(...args) {
         super(...args);
 
+        let { token, id, io, req, res } = args;
         this.error = void 0;
+
     }
+
+    /* verifyJWT(token) {
+        let payload = super.verifyJWT(token);
+
+        try {
+            jwt.verify(token, payload.key);
+
+            return payload;
+        }
+        catch(err) {
+            console.log('ERROR:', err);
+            //this.revokeJWT();
+            this.error = err;
+             
+            if(err.name === 'TokenExpiredError') {
+                this.error.class_name = this.class_name;
+                this.error.expired = true;
+                this.error.system = true;
+
+                payload.auth.signed === 1 ? payload.auth.signed = 2 : payload.auth.signed = 0;
+                return payload;
+            }
+        };
+    } */
+
+    /* async refreshJWT() {
+        let payload = super.refreshJWT();
+        if(payload) {
+            //REFRESH TOKEN
+            let private_key = KEYS_CACHE[payload.id];
+
+            payload.insecure && (private_key = payload.key);
+
+            if(!private_key) {
+                private_key = await getAccountPrivateKey(payload.id);
+                KEYS_CACHE[payload.id] = private_key;
+            }
+
+            this.token = this.signJWT(payload, private_key, payload.insecure ? {} : void 0);
+        }
+    } */
 
     checkSecurity(name, method) {
         let authError = function(...args) {
@@ -179,7 +222,7 @@ class SecuredAPI extends API {
             //this.generateError({ code: 403, message: 'Отказано в доступе. Возможно Ваша сессия завершилась.', data: { expired: true, class: this.constructor.name }});
         };
 
-        return this.auth.signed !== 1 && authError;
+        return this.auth ? this.auth.signed !== 1 && authError : authError;
     }
 
     security(name, method) {

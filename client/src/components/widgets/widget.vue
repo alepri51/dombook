@@ -1,9 +1,11 @@
 <template>
-    <v-card class="widget" fill-height tile>
+    <v-card class="widget" fill-height tile v-bind="$attrs">
         <v-container fluid grid-list-lg fill-height>
             <v-layout column>
-                <slot name="header"/>
-    
+                <div>
+                    <slot name="header"/>
+                </div>
+
                 <slot name="divider">
                     <!-- <v-divider/> -->
                 </slot>
@@ -11,6 +13,9 @@
                 <v-layout class="content" v-bind="$attrs" id="scroll" @scroll="onScroll">
                     <slot/>
                 </v-layout>
+
+                <slot name="footer"/>
+                
             </v-layout>
         </v-container>
         <div style="position: absolute; bottom: 2px; right: 16px; font-size: 10px" class="grey--text">{{name}}</div>
