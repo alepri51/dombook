@@ -59,6 +59,8 @@
                     '--embed-icon-color': this.$colors.shades.white,
                     '--editor-button-color': this.$vuetify.theme.secondary,
                     '--primary-color': this.$vuetify.theme.primary,
+                    '--secondary-color': this.$vuetify.theme.secondary,
+                    '--accent-color': this.$vuetify.theme.accent
                 }
             }
         },

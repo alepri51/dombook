@@ -6,30 +6,8 @@
 
         <div style="flex:1; position: absolute">
             <dropdown-filter class="pa-1" label="Бюджет" header="Бюджет покупки" filter-icon="fas fa-funnel-dollar" :items="languages" multi :display-count="2"/>
-            <dropdown-filter class="pa-1" label="Комнатность" search :items="rooms">
-                <div class="ui mini steps" slot="content">
-                <div class="step">
-                    <i class="truck icon"></i>
-                    <div class="content">
-                    <div class="title">Shipping</div>
-                    <div class="description">Choose your shipping options</div>
-                    </div>
-                </div>
-                <div class="active step">
-                    <i class="payment icon"></i>
-                    <div class="content">
-                    <div class="title">Billing</div>
-                    <div class="description">Enter billing information</div>
-                    </div>
-                </div>
-                <div class="disabled step">
-                    <i class="info icon"></i>
-                    <div class="content">
-                    <div class="title">Confirm Order</div>
-                    <div class="description">Verify order details</div>
-                    </div>
-                </div>
-                </div>
+            <dropdown-filter class="pa-1" label="Комнатность" stepper :items="rooms">
+                
             </dropdown-filter>
         </div>
 
@@ -88,11 +66,11 @@
                     { key: 'Vietnamese', text: 'Vietnamese', value: 'Vietnamese' },
                 ],
                 rooms: [
-                    { text: 'Студия +' },
-                    { text: '1 +' },
-                    { text: '2 +' },
-                    { text: '3 +' },
-                    { text: 'СП +' },
+                    { text: 'Студия+' },
+                    { text: '1+' },
+                    { text: '2+' },
+                    { text: '3+' },
+                    { text: 'СП+' },
                 ],
             };
         },
