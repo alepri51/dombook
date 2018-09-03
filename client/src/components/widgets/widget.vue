@@ -1,7 +1,7 @@
 <template>
     <v-card class="widget" fill-height tile v-bind="$attrs">
-        <v-container fluid grid-list-xs fill-height >
-            <v-layout column>
+        <v-container fluid grid-list-lg fill-height >
+            <v-layout column fill-height>
                 <div>
                     <slot name="header"/>
                 </div>
@@ -47,12 +47,17 @@
     }
 
     .container {
-        padding: 16px;
+        padding: 0;
+        margin: 0;
     }
 
+    .container .layout:only-child {
+        margin: 0!important;
+    }
     .content {
         overflow: auto;
-        margin: 0px!important;
+        margin: 0!important;
+        padding: 4px
     }
 </style>
 

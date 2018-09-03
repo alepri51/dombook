@@ -52,7 +52,7 @@
         },
         computed: {
             cssProps() {
-                debugger
+                //debugger
                 return {
                     '--scroll-background': this.$colors.shades.transparent,
                     '--scroll-color': this.$vuetify.theme.scrollColor,

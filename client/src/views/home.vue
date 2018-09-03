@@ -1,8 +1,5 @@
 <template>
-    <dashboard v-if="authenticated" :title="title" :layout="layout" :components="components" :data="{}" @REGISTER-COMPONENT="registerComponent" @date-changed="selected_date = arguments[0]" :date="selected_date"/>
-    <div v-else>
-        ДОСТУП ЗАКРЫТ
-    </div>
+    <dashboard :title="title" :layout="layout" :components="components" :data="{}" @REGISTER-COMPONENT="registerComponent" @date-changed="selected_date = arguments[0]" :date="selected_date"/>
 </template>
 
 <script>
@@ -17,7 +14,7 @@
         }, */
         methods: {
             getTitle() {
-                return 'Новости';
+                return 'Подбор';
             }
         },
         data() {
@@ -35,25 +32,25 @@
                                 "x": 0,
                                 "y": 0,
                                 "w": 10,
-                                "h": 1,
+                                "h": 2,
                                 "available": false,
                                 "comp": "selection"
                             },
                             {
                                 "id": 2,
                                 "x": 0,
-                                "y": 1,
-                                "w": 6,
-                                "h": 14,
+                                "y": 2,
+                                "w": 4,
+                                "h": 13,
                                 "available": false,
                                 "comp": "list"
                             },
                             {
                                 "id": 3,
-                                "x": 6,
-                                "y": 1,
-                                "w": 4,
-                                "h": 14,
+                                "x": 4,
+                                "y": 2,
+                                "w": 6,
+                                "h": 13,
                                 "available": false,
                                 "comp": "location"
                             }

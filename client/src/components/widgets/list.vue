@@ -1,12 +1,14 @@
 <template>
-    <widget name="" row wrap class="elevation-0">
+    <widget name="" wrap class="elevation-0 pa-2" align-center>
         <div slot="header">
-            КОРТПУСА
+            <h3>КОРПУСА</h3>
         </div>
 
-        <v-flex v-for="n in 40" :key="n" style="max-width: 250px">
-            <v-card color="blue-grey darken-2" class="white--text" :width="200" hover>
-                <sui-card>
+        <v-divider class="ma-1" slot="divider"/>
+
+        <v-flex d-flex v-for="n in 40" :key="n" justify-center>
+            
+                <sui-card style="max-width: 200px">
                     <sui-embed
                         icon="fas fa-film embed-icon"
                         id="90Omh7_I8vI"
@@ -16,18 +18,19 @@
                     />
                     <!-- <sui-image src="static/images/avatar/large/matthew.png" /> -->
                     <sui-card-content>
-                    <sui-card-header>Matt Giampietro</sui-card-header>
-                    <sui-card-meta>Friends</sui-card-meta>
+                    <sui-card-header>Корпус восточный {{n}}</sui-card-header>
+                    <sui-card-meta>ЖК "Домашний"</sui-card-meta>
                     <sui-card-description>
                         Matthew is an interior designer living in New York.
+                        Экпозиция
                     </sui-card-description>
                     </sui-card-content>
                     <sui-card-content extra>
-                    <sui-icon name="user" /> 75 Friends
-                    <span slot="right">Joined in 2013</span>
+                    <sui-icon name="user" /> 75 в продеже
+                    <span slot="right">сдача Q1 2019</span>
                     </sui-card-content>
                 </sui-card>
-            </v-card>
+            
         </v-flex>
     </widget>
 </template>

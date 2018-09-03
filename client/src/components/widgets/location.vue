@@ -1,8 +1,10 @@
 <template>
-    <widget name="" class="elevation-0">
+    <widget name="" class="elevation-0 pa-2">
         <div slot="header">
-            ИНФРАСТРУКТУРА
+            <h3>КАРТА</h3>
         </div>
+
+        <v-divider class="ma-1" slot="divider"/>
 
         <yandex-map ref="content"
             :coords="[55.749706, 37.598517]"
