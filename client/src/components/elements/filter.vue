@@ -23,13 +23,13 @@
 
                     <slot name="content" v-bind="items">
                         <div v-if="!stepper" @click="open = multi" class="scrolling menu" :style="open ? 'display: block' : 'display: none'">
-                            <div class="item" v-for="(item, inx) in items" :key="inx" @click="onSelect(inx, item)">
+                            <div class="item" v-for="(item, inx) in items" :key="inx" @click="onSelect(inx, item)" :class="{'accent--text': !!selection[inx]}">
                                 <!-- <div class="ui red empty circular label"></div> -->
                                 <i class="icon" :class="item.icon || !multi ? 'fas fa-circle' : selection[inx] ? 'fas fa-check-circle' :'far fa-circle'"></i>
                                 {{item.text}}
                             </div>
                         </div>
-                        <div v-else class="ui mini steps">
+                        <div v-else class="ui mini steps unstackable">
                             <a class="step" :class="{ active: !!selection[inx] }" v-for="(item, inx) in items" :key="inx" @click="onSelect(inx, item)">
                                 <!-- <i class="icon" :class="item.icon || !multi ? 'fas fa-circle' : selection[inx] ? 'fas fa-check-circle' :'far fa-circle'"></i> -->
                                 <div class="content">
@@ -161,15 +161,21 @@
         padding: 13px!important;
     }
 
-    .ui.steps .step.active {
-        background-color: var(--secondary-color)
-    }
-
-    .ui.steps .step.active:after {
-        background: var(--secondary-color)
+    .ui.steps {
+        margin: 0;
     }
 
     .ui.steps .step.active .title {
-        color: var(--primary-color)
+        color: var(--accent-color)
+    }
+
+    .ui.mini.steps .step {
+        padding: 1rem;
+    }
+
+    .ui.mini.steps .content .title {
+        font-size: 11px!important;
+        font-weight: 700!important;
+        text-transform: uppercase;
     }
 </style>

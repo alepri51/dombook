@@ -6,9 +6,11 @@
 
         <div style="flex:1; position: absolute">
             <dropdown-filter class="pa-1" label="Бюджет" header="Бюджет покупки" filter-icon="fas fa-funnel-dollar" :items="languages" multi :display-count="2"/>
-            <dropdown-filter class="pa-1" label="Комнатность" stepper :items="rooms">
-                
-            </dropdown-filter>
+            <dropdown-filter class="pa-1" label="Комнатность" header="Количество комнат" stepper :items="rooms"/>
+            <dropdown-filter class="pa-1" label="Тип лота" header="Что ищем ?" multi :items="lotTypes" :display-count="2"/>
+            <!-- <dropdown-filter class="pa-1" label="Комнатность" header="Количество комнат" stepper :items="rooms"/>
+            <dropdown-filter class="pa-1" label="Комнатность" header="Количество комнат" stepper :items="rooms"/>
+            <dropdown-filter class="pa-1" label="Комнатность" header="Количество комнат" stepper :items="rooms"/> -->
         </div>
 
             <!-- <v-combobox
@@ -70,8 +72,16 @@
                     { text: '1+' },
                     { text: '2+' },
                     { text: '3+' },
+                    { text: '4+' },
                     { text: 'СП+' },
                 ],
+                lotTypes: [
+                    { text: 'Квартира' },
+                    { text: 'Апартаменты' },
+                    { text: 'Машиноместо' },
+                    { text: 'Кладовая' }
+                ],
+
             };
         },
     }
