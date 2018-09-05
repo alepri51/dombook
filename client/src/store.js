@@ -26,6 +26,7 @@ Vue.use(Vuex);
 const CancelToken = axios.CancelToken;
 let requests_cache = new Cache();
 let api = void 0;
+let repeatQueue = [];
 
 export default new Vuex.Store({
     strict: true,
@@ -49,6 +50,26 @@ export default new Vuex.Store({
         },
 
         menu: [
+            {
+                icon: 'fas fa-newspaper',
+                name: 'Новости',
+                to: 'newslayout'
+            },
+            {
+                icon: '',
+                name: 'Статьи',
+                to: 'articleslayout'
+            },
+            {
+                icon: '',
+                name: 'Структура',
+                to: 'structurelayout'
+            },
+            {
+                icon: '',
+                name: 'Финансы',
+                to: 'payment'
+            }
         ],
         notFound: false,
         path_query: {},
@@ -81,10 +102,17 @@ export default new Vuex.Store({
                 console.log('request', config.url, requests_cache.length);
                 state.token && (config.headers.common.authorization = state.token);
 
+                config.repeatOnError && repeatQueue.push(config.repeatOnError);
+
+                //debugger
                 /* config.cancelToken = new CancelToken(function executor(cancel) {
                     // An executor function receives a cancel function as a parameter
                     activeRequests.push(cancel);
                 }); */
+
+                /* if(config.method === 'get' && state.auth && state.auth.signed !== 1) {
+                    throw new Error('intercepted:' + config.url);
+                } */
 
                 return config;
             });
@@ -95,9 +123,22 @@ export default new Vuex.Store({
 
                 error && (!error.system ? this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` }) : console.error(`ОШИБКА: ${error.message}`));
 
-                if(error && error.code === 403 && !error.system && auth.signed !== 1) {
+                error && this.commit('RESET_CACHE');
+
+                if(error && error.code === 403 && !error.system && auth && auth.signed !== 1) {
+                    //this.commit('RESET_CACHE');
                     console.log('SIGN IN SHOW');
                     this.commit('SHOW_MODAL', { signin: void 0 });
+                }
+
+                if(!error && repeatQueue.length) {
+                    //debugger
+                    
+                    repeatQueue.forEach(config => {
+                        delete config.repeatOnError;
+                        api(config)
+                    });
+                    repeatQueue = [];
                 }
 
                 response.error = error; //DO NOT REMOVE
@@ -108,10 +149,10 @@ export default new Vuex.Store({
                     !error && this.dispatch('execute', { cache: false, endpoint: 'signup.silent'});
                 }
                 else {
-
+                    
                     if(!state.auth || (state.auth && auth.signed !== state.auth.signed)) {
-                        this.commit('RESET_CACHE');
                         auth.signed === 0 && this.commit('RESET_ENTITIES');
+                        auth.signed === 0 && this.commit('RESET_CACHE');
                     }
                     else {
                     }
@@ -136,14 +177,14 @@ export default new Vuex.Store({
                     }
 
                     
-            }
+                }
 
                 response.data._cached = !!response.config.cache;
                 return response;
             });
 
             let onError = (error => {
-                this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` });
+                error.message.indexOf('intercepted') !== -1 ? console.error(`ОШИБКА: ${error.message}`) : this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` });
             });
 
             api.interceptors.request.use(onRequest, onError);
@@ -277,7 +318,7 @@ export default new Vuex.Store({
         },
     },
     actions: {
-        async execute({ commit, state }, { cache = true, method, endpoint, payload, headers, callback }) {
+        async execute({ commit, state }, { cache = true, method, endpoint, payload, headers, callback, repeatOnError }) {
             //console.log('REQUEST:', endpoint);
 
             let response;
@@ -291,6 +332,8 @@ export default new Vuex.Store({
             };
 
             config.cache = config.method === 'get' ? cache ? requests_cache : false : false;
+            repeatOnError && (config.repeatOnError = config);
+
             //config.cache = false;
             commit('LOADING', true);
 

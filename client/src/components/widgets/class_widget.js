@@ -32,7 +32,7 @@ export default {
         'auth.signed': function(val, old) {
             console.log('SIGN CHANGED from:', old, 'TO:', val);
             //val < old && this.load();
-            val && this.load();
+            val === 1 && this.load();
         }
     }
 }

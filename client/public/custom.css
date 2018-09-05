@@ -80,6 +80,16 @@ a.v-tabs__item:hover {
     color: inherit;
 }
 
+.fas {
+    font-family: "Font Awesome 5 Free"!important;
+    font-weight: 600!important;
+}
+
+.far {
+    font-family: "Font Awesome 5 Free"!important;
+    font-weight: 400!important;
+}
+
 .ui.embed>.icon:before {
     font-size: 2em;
     color: var(--embed-icon-color)!important;

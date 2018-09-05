@@ -18,7 +18,7 @@ export default {
     },
     methods: {
         getTitle() {
-            return 'dombook.ru';
+            return 'atlant.club';
         }
     },
     watch: {
