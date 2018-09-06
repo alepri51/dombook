@@ -1,8 +1,26 @@
 <template>
     <!-- <div style="flex:1; position: absolute"> -->
 
-        <div class="ui buttons">
+            <div v-if="inline" class="ui">
+                <span><i class="fas fa-plus mr-1"></i></span>
+                <span class="content">
+                    <div class="ui inline dropdown"  @click="open = !open" >
+                        <div class="text">{{ value }}</div>
+                        <i class="dropdown icon"></i>
+                        <div @click.stop.prevent class="menu" :style="open ? 'display: block' : 'display: none'">
+                            <div v-if="header" class="header">{{ header }}</div>
+                            <div v-if="header" class="divider"></div>
 
+                            <div class="item" v-for="(item, inx) in items" :key="inx" @click="onSelect(inx, item), (open = multi)" :class="{'accent--text': !!selection[inx]}">
+                                <i class="icon" :class="item.icon || selection[inx] ? 'fas fa-check-circle' :'far fa-circle'"></i>
+                                {{item.text}}
+                            </div>
+                        </div>
+                    </div>
+                </span>
+            </div>
+
+        <div v-else class="ui buttons">
             <div class="ui floating dropdown labeled icon top left pointing button secondary white--text" @click="open = !open" icon="filter">
                 <i class="icon" :class="filterIcon"></i>
                 <div class="text">{{ value }}</div>
@@ -25,7 +43,7 @@
                         <div v-if="!stepper" @click="open = multi" class="scrolling menu" :style="open ? 'display: block' : 'display: none'">
                             <div class="item" v-for="(item, inx) in items" :key="inx" @click="onSelect(inx, item)" :class="{'accent--text': !!selection[inx]}">
                                 <!-- <div class="ui red empty circular label"></div> -->
-                                <i class="icon" :class="item.icon || !multi ? 'fas fa-circle' : selection[inx] ? 'fas fa-check-circle' :'far fa-circle'"></i>
+                                <i class="icon" :class="item.icon || selection[inx] ? 'fas fa-check-circle' :'far fa-circle'"></i>
                                 {{item.text}}
                             </div>
                         </div>
@@ -57,6 +75,10 @@
     
     export default {
         props: {
+            inline: {
+                type: Boolean,
+                default: false
+            },
             stepper: {
                 type: Boolean,
                 default: false
@@ -107,7 +129,7 @@
 
                 let label = count > 0 && count <= this.displayCount ? keys.map(key => this.selection[key].text).toString() : count ? `выбрано: ${count}` : void 0;
 
-                return `${this.label}${label ? ': ' + label : ''}`;
+                return `${this.label}${!this.inline ? label ? ': ' + label : '' : ' ' + (label || '')}`;
             }
         },
         created() {

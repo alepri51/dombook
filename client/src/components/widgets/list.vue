@@ -18,16 +18,18 @@
                     />
                     <!-- <sui-image src="static/images/avatar/large/matthew.png" /> -->
                     <sui-card-content>
-                    <sui-card-header>Корпус восточный {{n}}</sui-card-header>
-                    <sui-card-meta>ЖК "Домашний"</sui-card-meta>
-                    <sui-card-description>
-                        Matthew is an interior designer living in New York.
-                        Экпозиция
-                    </sui-card-description>
+                        <a v-if="n % 5 === 0" class="ui red ribbon label mb-2">Горячее предложение</a>
+
+                        <sui-card-header>Корпус восточный {{n}}</sui-card-header>
+                        <sui-card-meta>ЖК "Домашний"</sui-card-meta>
+                        <sui-card-description>
+                            Matthew is an interior designer living in New York.
+                            Экпозиция
+                        </sui-card-description>
                     </sui-card-content>
                     <sui-card-content extra>
-                    <sui-icon name="user" /> 75 в продеже
-                    <span slot="right">сдача Q1 2019</span>
+                        <sui-icon name="user" /> 75 в продеже
+                        <span slot="right">сдача Q1 2019</span>
                     </sui-card-content>
                 </sui-card>
             

@@ -6,15 +6,26 @@ export default {
     components: {
         widget: () => import('./widget')
     },
+    data() {
+        return {
+            active: false
+        }
+    },
     activated() {
         console.log('activated', this.entity);
+        this.active = true;
         this.load();
+    },
+    deactivated() {
+        console.log('deactivated', this.entity);
+        this.active = false;
+        //this.load();
     },
     methods: {
         load() {
             //debugger;
 
-            this.execute({ endpoint: this.endpoint, method: 'get' });
+            this.active && this.execute({ endpoint: this.endpoint, method: 'get' });
         }
     },
     computed: {
