@@ -1,14 +1,19 @@
 <template>
     <!-- <div style="flex:1; position: absolute"> -->
+            <span v-if="inline" class="ui inline-filter">
+                <i class="icon" :class="filterIcon"></i>
 
-            <div v-if="inline" class="ui">
-                <span><i class="fas fa-plus mr-1"></i></span>
                 <span class="content">
                     <div class="ui inline dropdown"  @click="open = !open" >
                         <div class="text">{{ value }}</div>
                         <i class="dropdown icon"></i>
                         <div @click.stop.prevent class="menu" :style="open ? 'display: block' : 'display: none'">
-                            <div v-if="header" class="header">{{ header }}</div>
+                            
+                            <div v-if="header" class="header">
+                                <i class="icon" :class="headerIcon"></i>
+                                {{ header }}
+                            </div>
+
                             <div v-if="header" class="divider"></div>
 
                             <div class="item" v-for="(item, inx) in items" :key="inx" @click="onSelect(inx, item), (open = multi)" :class="{'accent--text': !!selection[inx]}">
@@ -18,7 +23,7 @@
                         </div>
                     </div>
                 </span>
-            </div>
+            </span>
 
         <div v-else class="ui buttons">
             <div class="ui floating dropdown labeled icon top left pointing button secondary white--text" @click="open = !open" icon="filter">
@@ -96,7 +101,7 @@
             },
             headerIcon: {
                 type: String,
-                default: 'fas fa-circle'
+                default: 'far fa-circle'
             },
             filterIcon: {
                 type: String,
@@ -112,12 +117,15 @@
             multi: {
                 type: Boolean,
                 default: false
+            },
+            selectedIndex: {
+                type: Number
             }
         },
         data() {
             return {
                 open: false,
-                selection: {}
+                selection: typeof this.selectedIndex === 'undefined' ? {} : { [this.selectedIndex]: this.items[this.selectedIndex] }
             }
         },
         computed: {
@@ -146,6 +154,8 @@
                 this.selection[inx] ? this.$delete(this.selection, inx) : this.$set(this.selection, inx, item);
 
                 this.$emit('select', this.selection);
+
+                console.log('MULTI', this.multi)
             },
             clear() {
                 this.selection = {};
@@ -200,4 +210,8 @@
         font-weight: 700!important;
         text-transform: uppercase;
     }
+
+    /* .ui.inline-filter {
+        position: absolute;
+    } */
 </style>

@@ -10,47 +10,12 @@
             <dropdown-filter class="pa-1" label="Тип лота" header="Что ищем ?" multi :items="lotTypes" :display-count="2"/>
             <dropdown-filter class="pa-1" label="Тип лота" header="Что ищем ?" :items="lotTypes" :display-count="2"/>
 
-            <dropdown-filter class="pa-1" inline label="Сортировка" header="параметры сортировки" :items="lotTypes" :display-count="2"/>
-            <!-- <dropdown-filter class="pa-1" label="Комнатность" header="Количество комнат" stepper :items="rooms"/>
-            <dropdown-filter class="pa-1" label="Комнатность" header="Количество комнат" stepper :items="rooms"/>
-            <dropdown-filter class="pa-1" label="Комнатность" header="Количество комнат" stepper :items="rooms"/> -->
-        
-        
-
-            <!-- <div class="ui header">
-                <i class="fas fa-user mr-2"></i>
-            <div class="content">
-                Сортировка
-                <div class="ui inline dropdown">
-                <div class="text">today</div>
-                <i class="dropdown icon"></i>
-                <div class="menu">
-                    <div class="header">Adjust time span</div>
-                    <div class="active item" data-text="today">Today</div>
-                    <div class="item" data-text="this week">This Week</div>
-                    <div class="item" data-text="this month">This Month</div>
-                </div>
-                </div>
+            <!-- <br> -->
+            <div class="mt-2">
+                <dropdown-filter class="secondary--text pa-1" multi inline label="Сортировка" header="параметры сортировки" filter-icon="fas fa-sort" :items="sort" :display-count="2"/>
+                <dropdown-filter class="secondary--text pa-1" inline :selected-index="0" label="Сортировка" header="параметры сортировки" filter-icon="fas fa-sort" :items="sort"/>
             </div>
-            </div> -->
-
-            
         </div>
-
-        
-
-            <!-- <v-combobox
-                v-model="current"
-                :items="languages"
-                label="Select a favorite activity or create a new one"
-                multiple
-            ></v-combobox>
-        <div style="width:100%;">
-            
-            
-            
-             -->
-   
     </widget>
 </template>
 

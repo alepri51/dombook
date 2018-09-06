@@ -4,8 +4,8 @@ const fs = require('fs-extra');
 const path = require('path');
 const compress_images = require('compress-images');
 
-const db = require('../models');
-const normalize = db.normalize;
+const db = require('./models');
+const { normalize } = require('./models/normalize');
 
 const { SecuredAPI, API } = require('./base_api');
 

@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto2');
 
 
-const { getAccountPrivateKey } = require('../models');
+const { getAccountPrivateKey } = require('./models');
 
 let KEYS_CACHE = {};
 

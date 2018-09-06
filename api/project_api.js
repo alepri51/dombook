@@ -1,9 +1,8 @@
 'use strict';
 
-const { normalize } = require('../models');
 const { Model, DBAccess } = require('./db_api');
 const { API, SecuredAPI } = require('./base_api');
-const db = require('../models');
+const db = require('./models');
 
 
 class Home extends Model {
@@ -11,8 +10,21 @@ class Home extends Model {
         super(...args);
     }
 
-    default() {
+    async default() {
         console.log('HOME DEFAULT');
+        
+        let buildings = await db.Building.find({}).populate('developer');
+        buildings = buildings.map( building => { 
+            building = { ...building._doc };
+            delete building.lots;
+
+            return building;
+        });
+
+        return {
+            buildings
+        }
+
         return {
             user: {
                 id: 1

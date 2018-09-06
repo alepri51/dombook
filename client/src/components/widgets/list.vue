@@ -6,29 +6,58 @@
 
         <v-divider class="ma-1" slot="divider"/>
 
-        <v-flex d-flex v-for="n in 40" :key="n" justify-center>
+        <v-flex d-flex v-for="(item, inx) in filter" :key="inx" justify-center>
             
-                <sui-card style="max-width: 200px">
-                    <sui-embed
+                <sui-card style="max-width: 350px; height: 450px">
+                    <!-- <sui-embed
                         icon="fas fa-film embed-icon"
                         id="90Omh7_I8vI"
-                        :placeholder="`https://placeimg.com/300/${200 + n}/nature`"
+                        :placeholder="`https://placeimg.com/300/${200 + item.id}/nature`"
                         source="youtube"
                         :iframe="{allowFullScreen: true }"
-                    />
-                    <!-- <sui-image src="static/images/avatar/large/matthew.png" /> -->
-                    <sui-card-content>
-                        <a v-if="n % 5 === 0" class="ui red ribbon label mb-2">Горячее предложение</a>
+                    /> -->
+                    <sui-image :src="`https://placeimg.com/300/${150 + item.id}/nature`" style="max-height: 150px;" />
+                    <sui-card-content style="overflow: hidden">
+                        <a v-if="item.id % 5 === 0" class="ui red ribbon label mb-2">Горячее предложение</a>
 
-                        <sui-card-header>Корпус восточный {{n}}</sui-card-header>
-                        <sui-card-meta>ЖК "Домашний"</sui-card-meta>
-                        <sui-card-description>
-                            Matthew is an interior designer living in New York.
-                            Экпозиция
+                        <sui-card-header>{{ item.developer.name }}</sui-card-header>
+                        <sui-card-meta>{{ item.id }}</sui-card-meta>
+                        <sui-card-description style="max-height: 180px; overflow: auto; font-size: smaller" class="pr-1">
+                            <div  v-for="(stat, key, inx) in item.statistics" :key="inx">
+                                <span>{{ key }}</span>
+                                <table class="ui definition table mt-0">
+                                    <tbody>
+                                        <tr v-for="(row, key, inx) in stat" :key="inx">
+                                            <td class="pa-1">{{ key }}</td>
+                                            <td class="pa-1">{{ row.square && `${row.square && row.square.min} - ${ row.square && row.square.max} m2` }}</td>
+                                            <td class="pa-1">{{ row.price && `${row.price && (row.price.min / 1000000).toFixed(2)} - ${ row.price && (row.price.max / 1000000).toFixed(2)} млн` }}</td>
+                                            <td class="pa-1" style="text-align: right">{{ `${row.count}` }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                            
+                                <!-- <span>Апартаменты</span>
+                                <table class="ui definition table mt-0">
+                                    <tbody>
+                                        <tr>
+                                            <td class="pa-1">1-комн</td>
+                                            <td class="pa-1">45 - 46м2</td>
+                                            <td class="pa-1">10 - 11 млн</td>
+                                            <td class="pa-1">12</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="pa-1">2-комн</td>
+                                            <td class="pa-1">45 - 46м2</td>
+                                            <td class="pa-1">10 - 11 млн</td>
+                                            <td class="pa-1">12</td>
+                                        </tr>
+                                    </tbody>
+                                </table> -->
+                            </div>
                         </sui-card-description>
                     </sui-card-content>
                     <sui-card-content extra>
-                        <sui-icon name="user" /> 75 в продеже
+                        <sui-icon name="user" /> {{ item.statistics.count }} в продаже
                         <span slot="right">сдача Q1 2019</span>
                     </sui-card-content>
                 </sui-card>
