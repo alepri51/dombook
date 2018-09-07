@@ -8,7 +8,7 @@
 
         <v-flex d-flex v-for="(item, inx) in filter" :key="inx" justify-center>
             
-                <sui-card style="max-width: 350px; height: 450px">
+                <sui-card style="max-width: 300px; ">
                     <!-- <sui-embed
                         icon="fas fa-film embed-icon"
                         id="90Omh7_I8vI"
@@ -16,13 +16,15 @@
                         source="youtube"
                         :iframe="{allowFullScreen: true }"
                     /> -->
-                    <sui-image :src="`https://placeimg.com/300/${150 + item.id}/nature`" style="max-height: 150px;" />
+                    <sui-image :src="`https://placeimg.com/300/${150 + item.id}/arch`" style="max-height: 150px;" />
+                    
+                    <a v-if="item.id % 5 === 0" class="ui red darken-2 ribbon label mb-2" style="position: absolute; left: -14px; top: 8px;">Горячее предложение</a>
+                    
                     <sui-card-content style="overflow: hidden">
-                        <a v-if="item.id % 5 === 0" class="ui red ribbon label mb-2">Горячее предложение</a>
 
                         <sui-card-header>{{ item.developer.name }}</sui-card-header>
-                        <sui-card-meta>{{ item.id }}</sui-card-meta>
-                        <sui-card-description style="max-height: 180px; overflow: auto; font-size: smaller" class="pr-1">
+                        <sui-card-meta>{{ item.builder.name }}</sui-card-meta>
+                        <sui-card-description style="overflow: auto; font-size: smaller" class="pr-1">
                             <div  v-for="(stat, key, inx) in item.statistics" :key="inx">
                                 <span>{{ key }}</span>
                                 <table class="ui definition table mt-0">

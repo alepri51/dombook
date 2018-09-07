@@ -1,29 +1,29 @@
 <template>
     <!-- <div style="flex:1; position: absolute"> -->
-            <span v-if="inline" class="ui inline-filter">
-                <i class="icon" :class="filterIcon"></i>
+        <span v-if="inline" class="ui inline-filter">
+            <i class="icon" :class="filterIcon"></i>
 
-                <span class="content">
-                    <div class="ui inline dropdown"  @click="open = !open" >
-                        <div class="text">{{ value }}</div>
-                        <i class="dropdown icon"></i>
-                        <div @click.stop.prevent class="menu" :style="open ? 'display: block' : 'display: none'">
-                            
-                            <div v-if="header" class="header">
-                                <i class="icon" :class="headerIcon"></i>
-                                {{ header }}
-                            </div>
+            <span class="content">
+                <div class="ui inline dropdown"  @click="open = !open" >
+                    <div class="text">{{ value }}</div>
+                    <i class="dropdown icon"></i>
+                    <div @click.stop.prevent class="menu" :style="open ? 'display: block' : 'display: none'">
+                        
+                        <div v-if="header" class="header">
+                            <i class="icon" :class="headerIcon"></i>
+                            {{ header }}
+                        </div>
 
-                            <div v-if="header" class="divider"></div>
+                        <div v-if="header" class="divider"></div>
 
-                            <div class="item" v-for="(item, inx) in items" :key="inx" @click="onSelect(inx, item), (open = multi)" :class="{'accent--text': !!selection[inx]}">
-                                <i class="icon" :class="item.icon || selection[inx] ? 'fas fa-check-circle' :'far fa-circle'"></i>
-                                {{item.text}}
-                            </div>
+                        <div class="item" v-for="(item, inx) in items" :key="inx" @click="onSelect(inx, item), (open = multi)" :class="{'accent--text': !!selection[inx]}">
+                            <i class="icon" :class="item.icon || selection[inx] ? 'fas fa-check-circle' :'far fa-circle'"></i>
+                            {{item.text}}
                         </div>
                     </div>
-                </span>
+                </div>
             </span>
+        </span>
 
         <div v-else class="ui buttons">
             <div class="ui floating dropdown labeled icon top left pointing button secondary white--text" @click="open = !open" icon="filter">
@@ -80,6 +80,10 @@
     
     export default {
         props: {
+            custom: {
+                type: Boolean,
+                default: false
+            },
             inline: {
                 type: Boolean,
                 default: false

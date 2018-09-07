@@ -2,10 +2,14 @@
     <widget name="" class="elevation-0 pa-2">
         <div slot="header">
             <h3>ПАРАМЕТРЫ ПОИСКА</h3>
+                    <vue-slider ref="slider" v-model="value" :min="0" :max="100" process-dragable :fixed="fixed"></vue-slider>
         </div>
 
         <div style="flex:1; position: absolute">
-            <dropdown-filter class="pa-1" label="Бюджет" header="Бюджет покупки" filter-icon="fas fa-funnel-dollar" :items="languages" multi :display-count="2"/>
+            <dropdown-filter class="pa-1" label="Бюджет" header="Бюджет покупки" filter-icon="fas fa-funnel-dollar" :items="languages" multi :display-count="2">
+                <vue-slider slot="content" ref="slider" v-model="value" :min="0" :max="100" process-dragable :width="300" fixed></vue-slider>
+            </dropdown-filter>
+
             <dropdown-filter class="pa-1" label="Комнатность" header="Количество комнат" stepper :items="rooms"/>
             <dropdown-filter class="pa-1" label="Тип лота" header="Что ищем ?" multi :items="lotTypes" :display-count="2"/>
             <dropdown-filter class="pa-1" label="Тип лота" header="Что ищем ?" :items="lotTypes" :display-count="2"/>
@@ -21,15 +25,53 @@
 
 <script>
     import Widget from './class_widget';
-    import dropdownFilter from '../elements/filter'
+    import dropdownFilter from '../elements/filter';
+    import vueSlider from 'vue-slider-component';
     
     export default {
         extends: Widget,
         components: {
-            dropdownFilter
+            dropdownFilter,
+            vueSlider
+        },
+        watch: {
+            'value': function(val, old) {
+                let n_min = val[0];
+                let n_max = val[1];
+
+                let o_min = old[0];
+                let o_max = old[1];
+
+                if(n_min === o_min && n_max === o_max) {
+                    //this.fixed = n_max - n_min > 5
+                }
+                else {
+                    let min = n_min - o_min;
+                    let max = o_max - n_max;
+
+                    this.fixed = (n_max + max) - (n_min - min) > 5;
+                    //(min > 0 || max > 0) && (this.fixed = false);
+                    //(min < 0 || max < 0) && (this.fixed = (n_max - max) - (n_min + min) > 5);
+                    //let restrict = (max_changed - min_changed > 5); 
+                    //this.fixed = restrict;
+                }
+
+                //debugger
+                /* if(min_changed || max_changed) {
+                    let restrict = (max - min > 5); 
+
+                    this.fixed = restrict;
+                } */
+                //else this.fixed = false;
+            }
         },
         data() {
             return {
+                fixed: false,
+                value: [
+                    15,
+                    20
+                ],
                 show: {
                     '1': false,
                     '2': false

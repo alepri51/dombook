@@ -13,13 +13,56 @@ class Home extends Model {
     async default() {
         console.log('HOME DEFAULT');
         
-        let buildings = await db.Building.find({}).populate('developer');
-        buildings = buildings.map( building => { 
-            building = { ...building._doc };
-            delete building.lots;
-
-            return building;
-        });
+        let lot_type = await db.Filter.findOne({ name: 'Квартира' });
+        //console.log(lot_types);
+        let buildings = await db.Lot.aggregate([
+            { "$match": { lot_type: lot_type._id } },
+            {
+                "$group": {
+                    "_id": "$building"
+                    
+                }
+            },
+            {
+                $lookup: {
+                    from: 'buildings',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'building'
+                }
+            },
+            {
+                $unwind: '$building'
+            },
+            {
+                $replaceRoot: {
+                    newRoot: '$building'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'organizations',
+                    localField: 'builder',
+                    foreignField: '_id',
+                    as: 'builder'
+                }
+            },
+            {
+                $unwind: '$builder'
+            },
+            {
+                $lookup: {
+                    from: 'organizations',
+                    localField: 'developer',
+                    foreignField: '_id',
+                    as: 'developer'
+                }
+            },
+            {
+                $unwind: '$developer'
+            },
+        ]).exec();
+        
 
         return {
             buildings

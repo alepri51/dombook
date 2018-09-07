@@ -55,25 +55,6 @@ const Project = mongoose.model('Project', new Schema({
     buildings: [{ type: Schema.Types.ObjectId, ref: 'Building' }]
 }));
 
-
-/* const Building = mongoose.model('Building', new Schema({ 
-    name: {
-        type: String,
-        select: true
-    },
-    project: { type: Schema.Types.ObjectId, ref: 'Project' },
-    lots: [{ type: Schema.Types.ObjectId, ref: 'Lot' }],
-    seller: { type: Schema.Types.ObjectId, ref: 'Seller' }
-}));
-
-const Lot = mongoose.model('Lot', new Schema({ 
-    name: {
-        type: String,
-        select: true
-    },
-    building: { type: Schema.Types.ObjectId, ref: 'Building' }
-}));
-*/
 const Seller = mongoose.model('Seller', new Schema({ 
     name: {
         type: String,
@@ -85,7 +66,7 @@ const Seller = mongoose.model('Seller', new Schema({
 //////////////////////////MODELS//////////////////////////////////////
 
 
-//////////////////////////MODELS//////////////////////////////////////
+//////////////////////////HELPERS//////////////////////////////////////
 
 async function getAccountPrivateKey(id) {
     let member = await User.findOne({ _id: id });
@@ -93,11 +74,36 @@ async function getAccountPrivateKey(id) {
     return member && member.account.private_key;
 }
 
-//////////////////////////MODELS//////////////////////////////////////
+async function drop() {
+    let drops = Object.keys(mongoose.connection.collections).map(async key => {
+        let collection = mongoose.connection.collections[key];
+
+        await collection.drop();
+    });
+
+    await Promise.all(drops);
+}
+
+async function save(model, data) {
+    /* let objs = await model.find({  });  */
+    let saved = await model.findOne({ id: data.id, type: data.type });
+
+    if(!saved) {
+        saved = new model({
+            ...data
+        });
+
+        saved = await saved.save();
+    } 
+
+    return saved;
+}
+//////////////////////////HELPERS//////////////////////////////////////
 
 (async () => { //DB INIT IF NEEDED
     const axios = require('axios');
     
+    //await drop();
     //let lotz = await Lot.find({});
     //await Lot.deleteMany({});
 
@@ -114,11 +120,16 @@ async function getAccountPrivateKey(id) {
 
     let objects = response.data;
 
+    /* for(let i = 0; i < objects.length; i++ ) {
+        await updateBuilding(objects[i]);
+    } */
+
+    console.log(objects);
     /* objects = objects.map(async id => {
         return await updateBuilding(id)
-    });
+    }); */
 
-    await Promise.all(objects); */
+    //await Promise.all(objects);
 
     async function updateBuilding(id) {
         let response = await axios({
@@ -130,92 +141,55 @@ async function getAccountPrivateKey(id) {
     
         let data = response.data.pop();
     
-        data.builder = new Organization({
-            ...data.builder,
-            type: 0
-        });
-        data.builder.save();
+        data.builder = await save(Organization, { ...data.builder, type: 0 });
+        data.developer = await save(Organization, { ...data.developer, type: 1 });
+   
+        data.constructive = await save(Filter, { ...data.constructive, type: 'Конструктив' });
+        data.construction_stage = await save(Filter, { ...data.construction_stage, type: 'Стадия строительства' });
+        data.realty_class = await save(Filter, { ...data.realty_class, type: 'Класс жилья' });
+        data.lot_type = await save(Filter, { ...data.lot_type, type: 'Тип лота' });
+        data.building_type = await save(Filter, { ...data.building_type, type: 'Тип корпуса' });
     
-    
-        data.developer = new Organization({
-            ...data.developer,
-            type: 1
-        });
-        data.developer.save();
-    
-        data.constructive = new Filter({
-            ...data.constructive,
-            type: 'Конструктив'
-        });
-        data.constructive.save();
-    
-        data.construction_stage = new Filter({
-            ...data.construction_stage,
-            type: 'Стадия строительства'
-        });
-        data.construction_stage.save();
-    
-        data.realty_class = new Filter({
-            ...data.realty_class,
-            type: 'Класс жилья'
-        });
-        data.realty_class.save();
-    
-        data.lot_type = new Filter({
-            ...data.lot_type,
-            type: 'Тип лота'
-        });
-        data.lot_type.save();
-    
-        data.building_type = new Filter({
-            ...data.building_type,
-            type: 'Тип корпуса'
-        });
-        data.building_type.save();
-    
-        let saved = await Building.findOne({ id: data.id }); 
-        let building = saved || new Building({
+        let building = await Building.findOne({ id: data.id }); 
+        building = building || new Building({
             ...data
         });
-    
-        let lots = data.lots.map(async lot => {
-            
-            lot.lot_finishing_type = new Filter({
-                ...lot.lot_finishing_type,
-                type: 'Отделка'
-            });
-            lot.lot_finishing_type.save();
-    
-            lot.lot_type = new Filter({
-                ...lot.lot_type,
-                type: 'Тип лота'
-            });
-            lot.lot_type.save();
-    
+
+        let lots = [];
+        for(let i = 0; i < data.lots.length; i++ ) {
+            let lot = data.lots[i];
+
+            lot.lot_finishing_type = await save(Filter, { ...lot.lot_finishing_type, type: 'Отделка' });
+            lot.lot_type = await save(Filter, { ...lot.lot_type, type: 'Тип лота' });
+        
             lot.building = building;
     
-            let saved = await Lot.findOne({ id: lot.id });
-            if(saved) {
-                lot = await Lot.findOneAndUpdate({ id: lot.id }, lot)
-            }
-            else {
-                lot = new Lot({
-                    ...lot
-                });
-                
-                lot.save();
-            }
-            //lot = await Lot.findOneAndUpdate(lot, lot);
+            lot = await save(Lot, { ...lot });
+
+            lots.push(lot);
+        }
+
+        /* let lots = data.lots.map(async lot => {
+            
+            lot.lot_finishing_type = await save(Filter, { ...lot.lot_finishing_type, type: 'Отделка' });
+            lot.lot_type = await save(Filter, { ...lot.lot_type, type: 'Тип лота' });
+        
+            lot.building = building;
+    
+            lot = await save(Lot, { ...lot });
     
             return lot;
         });
     
-        building.lots = await Promise.all(lots);
+        building.lots = await Promise.all(lots); */
+
+        building.lots = lots;
+
         building.statistics = data.lots.reduce((memo, lot) => {
                 let type = (lot.lot_type.name && lot.lot_type.name.toLowerCase()) || 'не понятная хуйня';
     
                 memo[type] = memo[type] || {};
-                let rooms = lot.is_studio ? 'st' : lot.is_open_plan ? 'op' : lot.rooms || 'room';
+                let rooms = lot.is_studio ? 'студия' : lot.is_open_plan ? 'СП' : lot.rooms + '-комн' || 'помещение';
     
                 memo[type][rooms] = memo[type][rooms] || {};
                 let obj = memo[type][rooms];
@@ -264,5 +238,6 @@ module.exports = {
     Project,
     Building,
     Lot,
-    Seller
+    Seller,
+    Filter
 }

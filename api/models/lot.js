@@ -25,7 +25,8 @@ const Lot = new Schema({
   ceiling_height: Number,
   lot_type: {
     type: Schema.Types.ObjectId,
-    ref: 'Filter'
+    ref: 'Filter',
+    index: true
   },
   planing_photos: [{
     url: String,
