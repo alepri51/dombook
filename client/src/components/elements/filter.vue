@@ -55,7 +55,7 @@
                             </div>
                         </div>
                         <div v-else class="ui mini steps unstackable">
-                            <a class="step" :class="{ active: !!selection[inx] }" v-for="(item, inx) in items" :key="inx" @click="onSelect(inx, item)">
+                            <a class="step" :class="{ active: !!selection[inx] }" v-for="(item, inx) in items" :key="inx" @click="onSelect(inx, item), open = multi">
                                 <!-- <i class="icon" :class="item.icon || !multi ? 'fas fa-circle' : selection[inx] ? 'fas fa-check-circle' :'far fa-circle'"></i> -->
                                 <div class="content">
                                     <div class="title">{{ item.text }}</div>

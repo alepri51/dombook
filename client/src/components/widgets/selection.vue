@@ -75,7 +75,7 @@
             </dropdown-filter>
 
             <dropdown-filter @select="onFilterChanged" :name="'rooms'" class="pa-1" label="Комнатность" header="Количество комнат" stepper :items="rooms"/>
-            <dropdown-filter :name="'lotType1'" class="pa-1" label="Тип лота" header="Что ищем ?" multi :items="lotTypes" :display-count="2"/>
+            <!-- <dropdown-filter :name="'lotType1'" class="pa-1" label="Тип лота" header="Что ищем ?" multi :items="lotTypes" :display-count="2"/> -->
             <dropdown-filter @select="onFilterChanged" :name="'lotType'" class="pa-1" label="Тип лота" header="Что ищем ?" :items="lotTypes" :display-count="2"/>
 
             <!-- <br> -->
