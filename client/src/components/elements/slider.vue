@@ -149,6 +149,7 @@
     const r = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1
     return value => Math.round(value * r) / r
   })()
+
   export default {
     name: 'VueSliderComponent',
     props: {
@@ -317,8 +318,10 @@
       },
       tooltipMergedPosition () {
         if (!this.isMounted) return {}
+
         const tooltipDirection = this.tooltipDirection[0]
         const dot0 = this.$refs.dot0
+
         if (dot0) {
           if (this.direction === 'vertical') {
             const style = {}
@@ -366,7 +369,7 @@
         }
       },
       isRange () {
-        return Array.isArray(this.value);
+        return Array.isArray(this.value)
       },
       slider () {
         return this.isRange ? [this.$refs.dot0, this.$refs.dot1] : this.$refs.dot
@@ -436,7 +439,6 @@
         return this.isRange ? [(this.currentValue[0] - this.minimum) / this.spacing * this.gap, (this.currentValue[1] - this.minimum) / this.spacing * this.gap] : ((this.currentValue - this.minimum) / this.spacing * this.gap)
       },
       limit () {
-          debugger
         return this.isRange ? this.fixed ? [[0, (this.total - this.fixedValue) * this.gap], [this.fixedValue * this.gap, this.size]] : [[0, this.position[1]], [this.position[0], this.size]] : [0, this.size]
       },
       valueLimit () {
@@ -530,6 +532,7 @@
         if (!this.piecewise && !this.piecewiseLabel) {
           return false
         }
+
         let arr = []
         for (let i = 0; i <= this.total; i++) {
           let style = this.direction === 'vertical' ? {
@@ -558,6 +561,7 @@
         if (val < this.min) {
           return this.printError('The maximum value can not be less than the minimum value.')
         }
+
         let resetVal = this.limitValue(this.val)
         this.setValue(resetVal)
         this.refresh()
@@ -566,6 +570,7 @@
         if (val > this.max) {
           return this.printError('The minimum value can not be greater than the maximum value.')
         }
+
         let resetVal = this.limitValue(this.val)
         this.setValue(resetVal)
         this.refresh()
@@ -592,6 +597,7 @@
         document.addEventListener('keydown', this.handleKeydown)
         document.addEventListener('keyup', this.handleKeyup)
         window.addEventListener('resize', this.refresh)
+
         if (this.isRange && this.tooltipMerge) {
           this.$refs.dot0.addEventListener('transitionend', this.handleOverlapTooltip)
           this.$refs.dot1.addEventListener('transitionend', this.handleOverlapTooltip)
@@ -607,6 +613,7 @@
         document.removeEventListener('keydown', this.handleKeydown)
         document.removeEventListener('keyup', this.handleKeyup)
         window.removeEventListener('resize', this.refresh)
+
         if (this.isRange && this.tooltipMerge) {
           this.$refs.dot0.removeEventListener('transitionend', this.handleOverlapTooltip)
           this.$refs.dot1.removeEventListener('transitionend', this.handleOverlapTooltip)
@@ -700,6 +707,7 @@
           return false
         }
         this.setValueOnPos(pos)
+
         if (this.isRange && this.tooltipMerge) {
           const timer = setInterval(() => this.handleOverlapTooltip(), 16.7)
           setTimeout(() => window.clearInterval(timer), this.speed * 1000)
@@ -714,6 +722,7 @@
         }
         if (this.isRange) {
           this.currentSlider = index
+
           if (isProcess) {
             if (!this.processDragable) {
               return false
@@ -736,8 +745,10 @@
         if (this.stopPropagation) {
           e.stopPropagation()
         }
+
         if (!this.flag) return false
         e.preventDefault()
+
         if (e.targetTouches && e.targetTouches[0]) e = e.targetTouches[0]
         if (this.processFlag) {
           this.currentSlider = 0
@@ -747,6 +758,7 @@
         } else {
           this.setValueOnPos(this.getPos(e), true)
         }
+
         if (this.isRange && this.tooltipMerge) {
           this.handleOverlapTooltip()
         }
@@ -858,6 +870,7 @@
           this.computedFixedValue()
           this.syncValue(noCb)
         }
+
         this.$nextTick(() => this.setPosition(speed))
       },
       computedFixedValue () {
@@ -865,6 +878,7 @@
           this.fixedValue = 0
           return false
         }
+
         this.fixedValue = this.currentIndex[1] - this.currentIndex[0]
       },
       setPosition (speed) {
@@ -910,6 +924,7 @@
       setTransitionTime (time) {
         // In order to avoid browser merge style and modify together
         time || this.$refs.process.offsetWidth
+
         if (this.isRange) {
           for (let i = 0; i < this.slider.length; i++) {
             this.slider[i].style.transitionDuration = `${time}s`
@@ -928,6 +943,7 @@
         if (this.data) {
           return val
         }
+
         const inRange = (v) => {
           if (v < this.min) {
             this.printError(`The value of the slider is ${val}, the minimum value is ${this.min}, the value of this slider can not be less than the minimum value`)
@@ -938,6 +954,7 @@
           }
           return v
         }
+
         if (this.isRange) {
           return val.map((v) => inRange(v))
         } else {
@@ -948,7 +965,7 @@
         let val = this.isRange ? this.val.concat() : this.val
         this.$emit('input', val)
         this.keydownFlag && this.$emit('on-keypress', val)
-        noCb || this.$emit('callback', val)
+        noCb || this.$emit('callback', this, val)
       },
       getValue () {
         return this.val
@@ -976,15 +993,20 @@
       },
       handleOverlapTooltip () {
         const isDirectionSame = this.tooltipDirection[0] === this.tooltipDirection[1]
+
         if (this.isRange && isDirectionSame) {
           const tooltip0 = this.reverse ? this.$refs.tooltip1 : this.$refs.tooltip0
           const tooltip1 = this.reverse ? this.$refs.tooltip0 : this.$refs.tooltip1
+
           const tooltip0Right = tooltip0.getBoundingClientRect().right
           const tooltip1Left = tooltip1.getBoundingClientRect().left
+
           const tooltip0Y = tooltip0.getBoundingClientRect().y
           const tooltip1Y = tooltip1.getBoundingClientRect().y + tooltip1.getBoundingClientRect().height
+
           const horizontalOverlap = this.direction === 'horizontal' && tooltip0Right > tooltip1Left
           const verticalOverlap = this.direction === 'vertical' && tooltip1Y > tooltip0Y
+
           if (horizontalOverlap || verticalOverlap) {
             this.handleDisplayMergedTooltip(true)
           } else {
@@ -996,6 +1018,7 @@
         const tooltip0 = this.$refs.tooltip0
         const tooltip1 = this.$refs.tooltip1
         const mergedTooltip = this.$refs.process.getElementsByClassName('vue-merged-tooltip')[0]
+
         if (show) {
           tooltip0.style.visibility = 'hidden'
           tooltip1.style.visibility = 'hidden'
@@ -1008,21 +1031,20 @@
       }
     },
     mounted () {
-        debugger
       this.isComponentExists = true
+
       if (typeof window === 'undefined' || typeof document === 'undefined') {
         return this.printError('window or document is undefined, can not be initialization.')
       }
+
       this.$nextTick(() => {
         if (this.isComponentExists) {
           this.getStaticData()
           this.setValue(this.limitValue(this.value), true, this.startAnimation ? this.speed : 0)
           this.bindEvents()
-          if (this.isRange && this.tooltipMerge) {
-            this.handleOverlapTooltip()
-          }
         }
       })
+
       this.isMounted = true
     },
     beforeDestroy () {

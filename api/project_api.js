@@ -63,6 +63,10 @@ class Home extends Model {
             },
         ]).exec();
         
+        buildings = buildings.map(building => {
+            delete building.lots;
+            return building;
+        });
 
         return {
             buildings

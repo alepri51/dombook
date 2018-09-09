@@ -26,7 +26,7 @@
         </span>
 
         <div v-else class="ui buttons">
-            <div class="ui floating dropdown labeled icon top left pointing button secondary white--text" @click="open = !open" icon="filter">
+            <div class="ui floating dropdown labeled icon top left pointing button secondary white--text" @click="open = !open, $emit('toggle', open)" icon="filter">
                 <i class="icon" :class="filterIcon"></i>
                 <div class="text">{{ value }}</div>
 
@@ -44,7 +44,9 @@
                         {{ header }}
                     </div>
 
-                    <slot name="content" v-bind="items">
+                    <slot name="divider"/>
+                    
+                    <slot name="content" v-bind="{ items, onSelect }">
                         <div v-if="!stepper" @click="open = multi" class="scrolling menu" :style="open ? 'display: block' : 'display: none'">
                             <div class="item" v-for="(item, inx) in items" :key="inx" @click="onSelect(inx, item)" :class="{'accent--text': !!selection[inx]}">
                                 <!-- <div class="ui red empty circular label"></div> -->
@@ -80,6 +82,10 @@
     
     export default {
         props: {
+            name: {
+                type: String,
+                required: true
+            },
             custom: {
                 type: Boolean,
                 default: false
@@ -157,13 +163,12 @@
 
                 this.selection[inx] ? this.$delete(this.selection, inx) : this.$set(this.selection, inx, item);
 
-                this.$emit('select', this.selection);
-
-                console.log('MULTI', this.multi)
+                this.$emit('select', { [this.name]: this.selection });
             },
             clear() {
                 this.selection = {};
                 this.open = false;
+                this.$emit('clear');
             },
             toggle() {
                 this.open = ! this.open

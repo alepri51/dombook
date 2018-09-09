@@ -74,6 +74,16 @@ async function getAccountPrivateKey(id) {
     return member && member.account.private_key;
 }
 
+async function getAccountKeys(id) {
+    let member = await User.findOne({ _id: id });
+
+    return member && member.account && {
+        privateKey: member.account.private_key,
+        publicKey: member.account.public_key,
+    }
+}
+
+
 async function drop() {
     let drops = Object.keys(mongoose.connection.collections).map(async key => {
         let collection = mongoose.connection.collections[key];
@@ -189,7 +199,7 @@ async function save(model, data) {
                 let type = (lot.lot_type.name && lot.lot_type.name.toLowerCase()) || 'не понятная хуйня';
     
                 memo[type] = memo[type] || {};
-                let rooms = lot.is_studio ? 'студия' : lot.is_open_plan ? 'СП' : lot.rooms + '-комн' || 'помещение';
+                let rooms = lot.is_studio ? 'студия' : lot.is_open_plan ? 'СП' : lot.rooms ? lot.rooms + '-комн' : 'помещение';
     
                 memo[type][rooms] = memo[type][rooms] || {};
                 let obj = memo[type][rooms];
@@ -234,6 +244,7 @@ async function save(model, data) {
 
 module.exports = {
     getAccountPrivateKey,
+    getAccountKeys,
     User,
     Project,
     Building,

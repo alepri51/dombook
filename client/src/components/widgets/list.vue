@@ -33,7 +33,7 @@
                                             <td class="pa-1">{{ key }}</td>
                                             <td class="pa-1">{{ row.square && `${row.square && row.square.min} - ${ row.square && row.square.max} m2` }}</td>
                                             <td class="pa-1">{{ row.price && `${row.price && (row.price.min / 1000000).toFixed(2)} - ${ row.price && (row.price.max / 1000000).toFixed(2)} млн` }}</td>
-                                            <td class="pa-1" style="text-align: right">{{ `${row.count}` }}</td>
+                                            <td class="pa-1" style="text-align: right">{{ `${row.count} шт` }}</td>
                                         </tr>
                                     </tbody>
                                 </table>

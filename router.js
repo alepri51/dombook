@@ -43,7 +43,7 @@ let multipartDetector = function(req, res, next) {
 
 let patterns = ['/:type\::id\.:action', '/:type\.:action', '/:type\::id', '/:type'];
 
-let processToken = function(req, res, next) {
+let processToken = async function(req, res, next) {
     let { type, id, action } = req.params;
 
     /* console.log('---------------BEGIN-----------------');
@@ -53,7 +53,19 @@ let processToken = function(req, res, next) {
     type = type.toLowerCase();
     !types[type] && (type = 'unknown');
 
-    let object = new types[type]({ token: req.headers.authorization, id, io, req, res });
+    req.params.type !== type && console.log('REQUEST CAST FROM :', req.params.type, 'TO:', type);
+
+    let token = req.headers.authorization;
+    
+    if(!token) {
+        let singup = new types['signup']({});
+        await singup.silent({}, req, res);
+        token = singup.token; 
+    }
+
+    let payload = await types[type].verifyJWT(token);
+
+    let object = new types[type]({ token: req.headers.authorization, id, io, req, res, payload });
     req.object = object;
 
     next();
@@ -92,11 +104,15 @@ let io = void 0;
 
 router.all(patterns, processToken, multipartDetector, async (req, res, next) => {
     try {
+        
+        console.log('BEGIN REQUEST:', req.path);
+
         let response = await proccedRequest(req, res);
 
         //console.log(req.path, response);
 
         res.json(response).end();
+        console.log('END REQUEST:', req.path);
     }
     catch(err) {
         let error = {

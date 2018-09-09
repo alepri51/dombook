@@ -28,7 +28,7 @@ class SignIn extends API {
             !current_user.account && current_user.id !== user.id && await current_user.remove();
 
             this.payload = user.projection();
-            this.payload.key = user.account.public_key;
+            //this.payload.key = user.account.public_key;
 
             this.payload.auth = {
                 id: user.id,

@@ -15,7 +15,39 @@ let router = new Router({
     ]
 });
 
+const hexEncode = function(str){
+    var hex, i;
+
+    var result = "";
+    for (i=0; i<str.length; i++) {
+        hex = str.charCodeAt(i).toString(16);
+        result += ("000"+hex).slice(-4);
+    }
+
+    return result
+}
+
+const hexDecode = function(str){
+    var j;
+    var hexes = str.match(/.{1,4}/g) || [];
+    var back = "";
+    for(j = 0; j<hexes.length; j++) {
+        back += String.fromCharCode(parseInt(hexes[j], 16));
+    }
+
+    return back;
+}
+
 router.beforeEach(async (to, from, next) => {
+/*     debugger
+    let from_path = from.fullPath.slice(1);
+    let to_path = to.fullPath.slice(1);
+
+    if(hexDecode(from_path) !== to_path) {
+        let encode = hexEncode(to_path);
+        router.replace({ path: encode, meta: to_path });
+    } */
+
     store.commit('HIDE_MODALS');
     
     let name = to.path.slice(1);

@@ -21,11 +21,19 @@ class Model extends API {
         return normalize(data);
     }
 
+    onNormalized(name, data) {
+
+    }
+
     onExecuted(name, result) {
         let transform = this.transforms.includes(name);
 
         if(transform && typeof result === 'object' && Object.keys(result).length) {
-            return this.normalize(result);
+            let data = this.normalize(result);
+            
+            this.onNormalized(name, data);
+            
+            return data;
         }
         else return result;
     }
@@ -36,6 +44,13 @@ class DBAccess extends Model {
         super(...args);
 
         this.transforms.push('save');
+    }
+
+    onNormalized(name, data) {
+        console.log('NORMALIZED', this.class_name, name);
+        if(name === 'save') {
+            this.io.emit('hello', data);
+        }
     }
 
     defaults() {

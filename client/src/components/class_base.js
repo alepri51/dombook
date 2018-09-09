@@ -14,12 +14,12 @@ export default {
     async created() {
 
         /* if(this.auth.member) {
-            console.log('REGISTER EVENT:', `${this.auth.member}:update:${this.entity}`);
+            //console.log('REGISTER EVENT:', `${this.auth.member}:update:${this.entity}`);
 
             this.$socket.off(this.events.update);
 
             let update = this.$socket.on(`${this.auth.member}:update:${this.entity}`, (data) => {
-                console.log('SOCKET UPDATE DATA:', data);
+                //console.log('SOCKET UPDATE DATA:', data);
                 
                 this.commit('SET_ENTITIES', { method: 'GET', ...data });
             });
@@ -61,6 +61,9 @@ export default {
         },
         route() {
             return this.state.route;
+        },
+        BASE_URL() {
+            return this.state.BASE_URL;
         }
     }
 }

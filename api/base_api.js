@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto2');
 
 
-const { getAccountPrivateKey } = require('./models');
+const { getAccountPrivateKey, getAccountKeys } = require('./models');
 
 let KEYS_CACHE = {};
 
@@ -18,7 +18,7 @@ class APIError extends Error {
 }
 
 class API {
-    constructor({ token, id, io, req, res }) {
+    constructor({ token, id, io, req, res, payload }) {
 
         this.io = io;
         this.token = token;
@@ -28,7 +28,8 @@ class API {
 
         let self = this;
 
-        this.payload = token ? this.verifyJWT(this.token) : void 0;
+        //this.payload = token ? this.verifyJWT(this.token) : void 0;
+        this.payload = payload;
 
         const handler = {
             get(target, propKey, receiver) {
@@ -86,7 +87,7 @@ class API {
         return await crypto.createPassword(salt, precision || 32);
     }
 
-    signJWT(payload, private_key, options = {algorithm: 'RS256', expiresIn: '10s'}) {
+    signJWT(payload, private_key, options = {algorithm: 'RS256', expiresIn: '50s'}) {
         //console.log('IAT:', payload.iat);
         delete payload.iat;
         delete payload.exp;
@@ -95,18 +96,33 @@ class API {
         return jwt.sign(payload, private_key, options);
     }
 
-    verifyJWT(token) {
+    static async verifyJWT(token) {
         let payload = jwt.decode(token);
 
         try {
-            jwt.verify(token, payload.key);
+
+            !KEYS_CACHE[payload.id] && (KEYS_CACHE[payload.id] = await getAccountKeys(payload.id));
+
+            let public_key = payload.insecure ? payload.key : KEYS_CACHE[payload.id].publicKey;
+
+            jwt.verify(token, public_key);
+            
+            if(payload.insecure) {
+                payload.signed = 0
+                payload.auth = void 0;
+            };
+
 
             return payload;
         }
         catch(err) {
             console.log('ERROR:', err);
+            if(err.name === 'TokenExpiredError') { 
+                payload.auth.signed === 1 && (payload.auth.signed = 2);
+                return payload;
+            };
             //this.revokeJWT();
-            this.error = err;
+            /* this.error = err; //STATIC никогда не вылезет
              
             if(err.name === 'TokenExpiredError') {
                 this.error.class_name = this.class_name;
@@ -116,7 +132,7 @@ class API {
                 //payload.auth.signed === 1 ? payload.auth.signed = 2 : payload.auth.signed = 0;
                 payload.auth.signed === 1 && (payload.auth.signed = 2);
                 return payload;
-            }
+            } */
         };
     }
 
@@ -125,13 +141,15 @@ class API {
         let payload = this.payload;
         if(payload) {
             //REFRESH TOKEN
-            let private_key = KEYS_CACHE[payload.id];
+            let private_key = KEYS_CACHE[payload.id] && KEYS_CACHE[payload.id].privateKey;
 
             payload.insecure && (private_key = payload.key);
 
             if(!private_key) {
-                private_key = await getAccountPrivateKey(payload.id);
-                KEYS_CACHE[payload.id] = private_key;
+                
+                KEYS_CACHE[payload.id] = await getAccountKeys(payload.id);
+
+                private_key = KEYS_CACHE[payload.id].privateKey;
             }
 
             this.token = this.signJWT(payload, private_key, payload.insecure ? {} : void 0);
@@ -170,47 +188,6 @@ class SecuredAPI extends API {
         this.error = void 0;
 
     }
-
-    /* verifyJWT(token) {
-        let payload = super.verifyJWT(token);
-
-        try {
-            jwt.verify(token, payload.key);
-
-            return payload;
-        }
-        catch(err) {
-            console.log('ERROR:', err);
-            //this.revokeJWT();
-            this.error = err;
-             
-            if(err.name === 'TokenExpiredError') {
-                this.error.class_name = this.class_name;
-                this.error.expired = true;
-                this.error.system = true;
-
-                payload.auth.signed === 1 ? payload.auth.signed = 2 : payload.auth.signed = 0;
-                return payload;
-            }
-        };
-    } */
-
-    /* async refreshJWT() {
-        let payload = super.refreshJWT();
-        if(payload) {
-            //REFRESH TOKEN
-            let private_key = KEYS_CACHE[payload.id];
-
-            payload.insecure && (private_key = payload.key);
-
-            if(!private_key) {
-                private_key = await getAccountPrivateKey(payload.id);
-                KEYS_CACHE[payload.id] = private_key;
-            }
-
-            this.token = this.signJWT(payload, private_key, payload.insecure ? {} : void 0);
-        }
-    } */
 
     checkSecurity(name, method) {
         let authError = function(...args) {
