@@ -16,8 +16,8 @@ Vue.use(SuiVue);
 
 Vue.use(Vuetify, {
     theme: {
-        primary: colors.teal.darken1,
-        secondary: colors.cyan.darken1,
+        primary: colors.lime.darken1,
+        secondary: colors.deepPurple.darken1,
         accent: colors.deepOrange.base,
         error: colors.red.accent4,
         warning: colors.yellow.accent4,
@@ -28,7 +28,7 @@ Vue.use(Vuetify, {
         unimportant: colors.blueGrey.base,
         transparent: colors.teal.lighten5,
         scroll: colors.cyan.lighten4,
-        scrollColor: colors.cyan.lighten3,
+        scrollColor: colors.lime.lighten1,
     }
 });
 

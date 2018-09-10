@@ -16,7 +16,10 @@ const Lot = new Schema({
   section: String,
   floor: String,
   rooms: String,
-  price: Number,
+  price: {
+      type: Number,
+      index: true
+  },
   price_square: Number,
   square: Number,
   is_open_plan: Boolean,

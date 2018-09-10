@@ -6,6 +6,7 @@ const { Schema } = mongoose
 /* Schema */
 const Building = new Schema({
   id: Number,
+  project_name: String,
   name: String,
   address: {
     string: String,

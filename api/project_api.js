@@ -10,29 +10,92 @@ class Home extends Model {
         super(...args);
     }
 
-    async default() {
-        console.log('HOME DEFAULT');
+    async default(filters) {
+        console.log('HOME DEFAULT', filters);
+
+        let match = Object.entries(filters).reduce((memo, entry) => {
+            let [key, value] = entry;
+            key === 'price' && (memo['price'] = { $gte: value[0], $lte: value[1] });
+            key === 'types' && (memo['lot_type.name'] = { $in: Object.entries(value).reduce((memo, entry) => {
+                    let [key, value] = entry;
+
+                    memo.push(value.text);
+                    return memo;
+                }, [])
+            });
+
+            return memo;
+        }, {});
         
-        let lot_type = await db.Filter.findOne({ name: 'Квартира' });
-        //console.log(lot_types);
+        
         let buildings = await db.Lot.aggregate([
-            { "$match": { lot_type: lot_type._id } },
+            /* { "$match": { 'price': { $gt: filters.price[0], $lt: filters.price[1] } } }, */
             {
-                "$group": {
-                    "_id": "$building"
-                    
+                $lookup: {
+                    from: 'filters',
+                    localField: 'lot_type',
+                    foreignField: '_id',
+                    as: 'lot_type'
+                }
+            },
+            { "$match": { ...match } },
+            {
+                $unwind: '$lot_type'
+            },
+            {
+                $group: {
+                    _id: {
+                        building: "$building",
+                        lot_type: "$lot_type.name",
+                        rooms: "$rooms",
+                        is_open_plan: "$is_open_plan",
+                        is_studio: "$is_studio"
+                    },
+                    building: { $addToSet: "$building" },
+                    lot_type: { $addToSet: "$lot_type.name" },
+                    rooms: { $addToSet: "$rooms" },
+                    is_open_plan: { $addToSet: "$is_open_plan" },
+                    is_studio: { $addToSet: "$is_studio" },
+
+                    count: { $sum: 1 },
+                    price_min: { $min: '$price'},
+                    price_max: { $max: '$price'},
+                    m2_price_min: { $min: '$price_square'},
+                    m2_price_max: { $max: '$price_square'},
+                    square_min: { $min: '$square'},
+                    square_max: { $max: '$square'},
                 }
             },
             {
                 $lookup: {
                     from: 'buildings',
-                    localField: '_id',
+                    localField: 'building',
                     foreignField: '_id',
                     as: 'building'
                 }
             },
             {
                 $unwind: '$building'
+            },
+/*             {
+                $project: {
+                    _id: 0, name: "$staff.like", count: {$add: [1]}}} */
+            {
+                $addFields: {
+
+                    'building.statistics.lot_type': "$lot_type",
+                    'building.statistics.rooms': "$rooms",
+                    'building.statistics.is_open_plan': "$is_open_plan",
+                    'building.statistics.is_studio': "$is_studio",
+
+                    'building.statistics.count': '$count',
+                    'building.statistics.price_min': '$price_min',
+                    'building.statistics.price_max': '$price_max',
+                    'building.statistics.m2_price_min': '$m2_price_min',
+                    'building.statistics.m2_price_max': '$m2_price_max',
+                    'building.statistics.square_min': '$square_min',
+                    'building.statistics.square_max': '$square_max'
+                }
             },
             {
                 $replaceRoot: {
@@ -61,56 +124,48 @@ class Home extends Model {
             {
                 $unwind: '$developer'
             },
-        ]).exec();
-        
+            {
+                $project: {
+                    lots: 0
+                }
+            }
+        ]);
+
         buildings = buildings.map(building => {
-            delete building.lots;
+            let stats = building.statistics;
+            let type = (stats.lot_type[0] && stats.lot_type[0].toLowerCase()) || 'что это ?';
+            let rooms = stats.is_studio[0] ? 'студия' : stats.is_open_plan[0] ? 'СП' : stats.rooms[0] ? stats.rooms[0] + '-комн' : 'помещение';
+
+            let new_stat = {};
+            new_stat[type] = {};
+            new_stat[type][rooms] = {};
+            let stat = new_stat[type][rooms];
+
+            stat.count = stats.count;
+
+            stat.square = {
+                min: stats.square_min,
+                max: stats.square_max
+            }
+
+            stat.price = {
+                min: stats.price_min,
+                max: stats.price_max
+            }
+
+            stat.square_price = {
+                min: stats.m2_price_min,
+                max: stats.m2_price_max
+            }
+
+            building.statistics = new_stat;
+
             return building;
         });
 
         return {
             buildings
         }
-
-        return {
-            user: {
-                id: 1
-            },
-            home: {
-                id: 1,
-                hello: 'world',
-                filters: [
-                    {
-                        id: 1,
-                        label: 'Бюджет',
-                        type: 'money',
-                        min: '1000K',
-                        max: '100000K',
-                        step: '5000K'
-                    },
-                    {
-                        id: 2,
-                        label: 'Стоимость м2',
-                        type: 'money',
-                        min: '1000K',
-                        max: '100000K',
-                        step: '5000K'
-                    },
-                    {
-                        id: 3,
-                        label: 'Локация',
-                        type: 'select',
-                        enum: ['ЦАО', 'САО', 'СВАО']
-                    },
-                    {
-                        id: 4,
-                        label: 'Комнатность',
-                        type: 'select',
-                        enum: ['СТ+', '1+', '2+', '3+', '4+']
-                    }
-                ]
-            }
-        };
     }
 }
 

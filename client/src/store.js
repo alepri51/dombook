@@ -294,7 +294,7 @@ export default new Vuex.Store({
             }
         },
         SET_ENTITIES(state, { entities, map, result, entry, method, replace }) {
-            if(entities && method.toUpperCase() === 'GET') {
+            if(entities /* && method.toUpperCase() === 'GET' */) {
                 //debugger;
                 console.log('REPLACE', replace);
                 if(replace) {

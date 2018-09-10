@@ -1,14 +1,14 @@
 <template>
     <widget name="" wrap class="elevation-0 pa-2" align-center>
         <div slot="header">
-            <h3>КОРПУСА</h3>
+            <h3>КОРПУСА {{ filter.length }}</h3>
         </div>
 
         <v-divider class="ma-1" slot="divider"/>
 
         <v-flex d-flex v-for="(item, inx) in filter" :key="inx" justify-center>
             
-                <sui-card style="max-width: 300px; ">
+                <sui-card style="min-width: 250px; max-width: 350px;">
                     <!-- <sui-embed
                         icon="fas fa-film embed-icon"
                         id="90Omh7_I8vI"
@@ -19,11 +19,12 @@
                     <sui-image :src="`https://placeimg.com/300/${150 + item.id}/arch`" style="max-height: 150px;" />
                     
                     <a v-if="item.id % 5 === 0" class="ui red darken-2 ribbon label mb-2" style="position: absolute; left: -14px; top: 8px;">Горячее предложение</a>
-                    
+                    <div v-if="item.name" class="ui secondary white--text mb-2" style="padding: 4px; position: absolute; width: 100%; left: 0px; top: 79px;">{{ item.name }}</div>
+
                     <sui-card-content style="overflow: hidden">
 
-                        <sui-card-header>{{ item.developer.name }}</sui-card-header>
-                        <sui-card-meta>{{ item.builder.name }}</sui-card-meta>
+                        <sui-card-header>{{ `${item.id} ${item.project_name}` }}</sui-card-header>
+                        <sui-card-meta>{{ `${item.developer.name === item.builder.name ? item.developer.name : `${item.developer.name} ${item.builder.name ? '(' + item.builder.name +')' : ''}`}` }}</sui-card-meta>
                         <sui-card-description style="overflow: auto; font-size: smaller" class="pr-1">
                             <div  v-for="(stat, key, inx) in item.statistics" :key="inx">
                                 <span>{{ key }}</span>

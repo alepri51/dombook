@@ -171,7 +171,9 @@ async function save(model, data) {
 
             lot.lot_finishing_type = await save(Filter, { ...lot.lot_finishing_type, type: 'Отделка' });
             lot.lot_type = await save(Filter, { ...lot.lot_type, type: 'Тип лота' });
-        
+            
+            lot.filter_rooms = lot.is_studio ? 0 : lot.is_open_plan ? 8 : lot.rooms ? lot.rooms : 9;
+            
             lot.building = building;
     
             lot = await save(Lot, { ...lot });
@@ -196,7 +198,7 @@ async function save(model, data) {
         building.lots = lots;
 
         building.statistics = data.lots.reduce((memo, lot) => {
-                let type = (lot.lot_type.name && lot.lot_type.name.toLowerCase()) || 'не понятная хуйня';
+                let type = (lot.lot_type.name && lot.lot_type.name.toLowerCase()) || 'что это ?';
     
                 memo[type] = memo[type] || {};
                 let rooms = lot.is_studio ? 'студия' : lot.is_open_plan ? 'СП' : lot.rooms ? lot.rooms + '-комн' : 'помещение';
@@ -204,7 +206,7 @@ async function save(model, data) {
                 memo[type][rooms] = memo[type][rooms] || {};
                 let obj = memo[type][rooms];
     
-                if(lot.lot_type.name && ['квартира', 'апартаменты'].includes(lot.lot_type.name.toLowerCase())) {
+                if(lot.lot_type.name && ['квартира', 'апартаменты', 'нежилое'].includes(lot.lot_type.name.toLowerCase())) {
     
                     obj.square = obj.square || {};
                     obj.square = {
