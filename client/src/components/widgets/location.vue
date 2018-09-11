@@ -1,10 +1,10 @@
 <template>
-    <widget name="" class="elevation-0 pa-2">
-        <div slot="header">
-            <h3>КАРТА</h3>
+    <widget name="" class="elevation-0 pa-2" >
+        <!-- <div slot="header">
+            <div class="ui label secondary white--text">КАРТА</div>
         </div>
 
-        <v-divider class="ma-1" slot="divider"/>
+        <v-divider class="ma-1" slot="divider"/> -->
 
         <yandex-map ref="content"
             :coords="[55.749706, 37.598517]"
@@ -18,6 +18,8 @@
             :placemarks="placemarks"  
             
             @map-was-initialized="initHandler"
+
+            style="border: 1px solid #ddd"
         >
         </yandex-map>
 

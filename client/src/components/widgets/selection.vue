@@ -5,7 +5,6 @@
         </div> -->
 
         <div style="flex:1; position: absolute">
-            <dropdown-filter :name="'layout'" class="pa-1" label='Лэйаут' multi :items="[{ text: 'Карта'}, {text:'Корпуса'}]" :display-count="2"/>
 
             <dropdown-filter 
                 @select="onFilterChanged"
@@ -75,10 +74,13 @@
                 </div>
             </dropdown-filter>
 
-            <dropdown-filter @select="onFilterChanged" :name="'rooms'" class="pa-1" label="Комнатность" header="Количество комнат" multi stepper :items="rooms" :display-count="2"/>
+            <dropdown-filter filter-icon="fab fa-buromobelexperte" @select="onFilterChanged" :name="'rooms'" class="pa-1" label="Комнатность" header="Количество комнат" multi stepper :items="rooms" :display-count="2"/>
             <dropdown-filter @select="onFilterChanged" :name="'types'" class="pa-1" label="Тип лота" header="Что ищем ?" multi :items="lotTypes" :display-count="1"/>
 
             <dropdown-filter :name="'add'" class="pa-1" label='Дополнительно' header="Что ищем ?" multi :items="lotTypes" :display-count="1"/>
+
+            <v-spacer/>
+            <dropdown-filter filter-icon="fas fa-columns" :name="'layout'" class="pa-1" label='Лэйаут' multi :items="[{ text: 'Карта'}, {text:'Корпуса'}]" :display-count="2"/>
         </div>
     </widget>
 </template>
