@@ -30,26 +30,35 @@
                             {
                                 "id": 1,
                                 "x": 0,
-                                "y": 0,
+                                "y": 1,
                                 "w": 10,
-                                "h": 2,
+                                "h": 1,
                                 "available": false,
                                 "comp": "selection"
+                            },
+                            {
+                                "id": 4,
+                                "x": 0,
+                                "y": 0,
+                                "w": 10,
+                                "h": 1,
+                                "available": false,
+                                "comp": "selection1"
                             },
                             {
                                 "id": 2,
                                 "x": 0,
                                 "y": 2,
-                                "w": 4,
+                                "w": 5,
                                 "h": 13,
                                 "available": false,
                                 "comp": "list"
                             },
                             {
                                 "id": 3,
-                                "x": 4,
+                                "x": 5,
                                 "y": 2,
-                                "w": 6,
+                                "w": 5,
                                 "h": 13,
                                 "available": false,
                                 "comp": "location"

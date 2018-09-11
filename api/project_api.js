@@ -23,11 +23,28 @@ class Home extends Model {
     async default(filters) {
         console.log('HOME DEFAULT', filters);
 
+        //let bs = await db.Lot.find({ $and: [{is_studio: true}, { rooms: null }] });
+
         filters.price = filters.price || [5000000, 10000000];
         
         let match = Object.entries(filters).reduce((memo, entry) => {
             let [key, value] = entry;
             
+            if(key === 'rooms') {
+                Object.keys(value).forEach(key => {
+                    let rooms = key;
+
+                    let arr = [];
+
+                    rooms === '0' && (memo['is_studio'] = true);
+                    rooms === '1' && (memo['is_open_plan'] = true);
+                    //rooms !== '0' && rooms !== '5' && (memo['rooms_count'] = { $gte: parseInt(rooms) });
+                    if(rooms !== '0' && rooms !== '1') {
+                        memo['rooms_count'] = { $gte: parseInt(rooms) - 1 }
+                    }
+                });
+            };
+
             if(key === 'price') {
                 let diff = value[1] - value[0];
                 
@@ -47,8 +64,21 @@ class Home extends Model {
             return memo;
         }, {});
         
-        
+        //match['building'] = '49';
+
         let buildings = await db.Lot.aggregate([
+            {
+                $addFields: {
+                    rooms_count: { 
+                        $convert: { 
+                            input: "$rooms", 
+                            to: "int", 
+                            onError: "Error", 
+                            onNull: 0
+                        } 
+                    }
+                 }
+            },
             {
                 $lookup: {
                     from: 'filters',
@@ -59,6 +89,9 @@ class Home extends Model {
             },
             { "$match": { ...match } },
             {
+                $sort: { price : 1 }
+            },
+            {
                 $unwind: '$lot_type'
             },
             {
@@ -66,13 +99,13 @@ class Home extends Model {
                     _id: {
                         building: "$building",
                         lot_type: "$lot_type.name",
-                        rooms: "$rooms",
+                        rooms: "$rooms_count",
                         is_open_plan: "$is_open_plan",
                         is_studio: "$is_studio"
                     },
                     building: { $addToSet: "$building" },
                     lot_type: { $addToSet: "$lot_type.name" },
-                    rooms: { $addToSet: "$rooms" },
+                    rooms: { $addToSet: "$rooms_count" },
                     is_open_plan: { $addToSet: "$is_open_plan" },
                     is_studio: { $addToSet: "$is_studio" },
 
@@ -85,15 +118,6 @@ class Home extends Model {
                     square_max: { $max: '$square'},
                 }
             },
-            /* {
-                $group: {
-                    _id: "$building",
-                    building: { $addToSet: "$building" },
-                }
-            },
-            {
-                $unwind: '$building'
-            }, */
             {
                 $lookup: {
                     from: 'buildings',
@@ -155,11 +179,21 @@ class Home extends Model {
                 }
             }
         ]);
+        
+        //buildings = buildings.filter(b => b.id === 49);
 
-        buildings = buildings.map(building => {
+        buildings = buildings.reduce((memo, building) => {
+            let b = memo.find(b => b.id === building.id);
+            !b && memo.push(building);
+
             let stats = building.statistics;
             let type = (stats.lot_type[0] && stats.lot_type[0].toLowerCase()) || 'что это ?';
-            let rooms = stats.is_studio[0] ? 'студия' : stats.is_open_plan[0] ? 'СП' : stats.rooms[0] ? stats.rooms[0] + '-комн' : 'помещение';
+            //let rooms = stats.is_studio[0] ? 'студия' : stats.is_open_plan[0] ? 'СП' : stats.rooms[0] ? stats.rooms[0] + '-комн' : 'помещение';
+            let rooms = stats.is_open_plan[0] ? stats.is_studio[0] ? 'СП студия' : 'СП' : stats.is_studio[0] ? 'студия' : '';
+            //rooms = stats.is_studio[0] && 'студия';
+
+            let rooms_count = stats.rooms[0] ? stats.rooms[0] + '-комн' : rooms ? '' : 'помещение';
+            rooms = `${rooms ? rooms : ''}${rooms ? ' ' + rooms_count : rooms_count}`;
 
             let new_stat = {};
             new_stat[type] = {};
@@ -184,9 +218,14 @@ class Home extends Model {
             }
 
             building.statistics = new_stat;
-
-            return building;
-        });
+            if(b) {
+                b.statistics[type] = b.statistics[type] || building.statistics[type];
+                b.statistics[type][rooms] = building.statistics[type][rooms]
+            };
+            //return building;
+            
+            return memo;
+        }, []);
 
         return {
             buildings

@@ -1,11 +1,12 @@
 <template>
-    <widget name="" class="elevation-0 pa-2">
-        <div slot="header">
+    <widget name="" class="elevation-0 pa-0">
+        <!-- <div slot="header">
             <h3>ПАРАМЕТРЫ ПОИСКА</h3>
-                    <!-- <vue-slider ref="slider" v-model="value" :min="0" :max="100" process-dragable :fixed="fixed" @drag-end="onDragStart"></vue-slider> -->
-        </div>
+        </div> -->
 
         <div style="flex:1; position: absolute">
+            <dropdown-filter :name="'layout'" class="pa-1" label='Лэйаут' multi :items="[{ text: 'Карта'}, {text:'Корпуса'}]" :display-count="2"/>
+
             <dropdown-filter 
                 @select="onFilterChanged"
                 :name="'price'"
@@ -74,15 +75,10 @@
                 </div>
             </dropdown-filter>
 
-            <dropdown-filter @select="onFilterChanged" :name="'rooms'" class="pa-1" label="Комнатность" header="Количество комнат" stepper :items="rooms"/>
+            <dropdown-filter @select="onFilterChanged" :name="'rooms'" class="pa-1" label="Комнатность" header="Количество комнат" multi stepper :items="rooms" :display-count="2"/>
             <dropdown-filter @select="onFilterChanged" :name="'types'" class="pa-1" label="Тип лота" header="Что ищем ?" multi :items="lotTypes" :display-count="1"/>
-            <!-- <dropdown-filter @select="onFilterChanged" :name="'lotType'" class="pa-1" label="Тип лота" header="Что ищем ?" :items="lotTypes" :display-count="2"/> -->
 
-            <!-- <br> -->
-            <div class="mt-2">
-                <dropdown-filter :name="'sort'" class="secondary--text pa-1" multi inline :selected-index="0" label="Сортировка" header="параметры сортировки" filter-icon="fas fa-sort" :items="sort" :display-count="2"/>
-                <dropdown-filter :name="'sort1'" class="secondary--text pa-1" inline :selected-index="0" label="Сортировка" header="параметры сортировки" filter-icon="fas fa-sort" :items="sort"/>
-            </div>
+            <dropdown-filter :name="'add'" class="pa-1" label='Дополнительно' header="Что ищем ?" multi :items="lotTypes" :display-count="1"/>
         </div>
     </widget>
 </template>
@@ -106,27 +102,26 @@
             },
             onFilterChanged(value) {
                 //debugger;
+                
                 if(value.price) {
                     value = value.price[0];
                     value.price = value.range;
                     delete value.range;
                 }
 
-                /* if(value.types) {
-                    value.types = Object.entries(value.types).reduce((memo, entry) => {
-                        let [key, value] = entry;
-
-                        memo.push(value.text);
-                        return memo;
-                    }, []);
-                } */
-
                 Object.assign(this.filters, value);
+                
                 console.log('FILTERS', this.filters);
 
                 this.filters.price && (this.label = `Бюджет: ${(this.filters.price[0] / 1000000).toFixed(2)} - ${(this.filters.price[1] / 1000000).toFixed(2)}`);
 
-                this.execute({ endpoint: 'home', payload: this.filters, method: 'post' });
+                this.timer && clearTimeout(this.timer);
+
+                this.timer = setTimeout(() => {
+                    this.timer = void 0;
+
+                    this.execute({ endpoint: 'home', payload: this.filters, method: 'post' });
+                }, 1000);
             },
             onOpen(open) {
                 this.so = open;
@@ -139,17 +134,8 @@
                     context.currentSlider === 1 && context.setValue([max - 5000000, max]);
                     context.currentSlider === 0 && context.setValue([min, min + 5000000]);
                 }
-                else {
-                    if(onSelect) {
-                        this.timer && clearTimeout(this.timer);
-
-                        this.timer = setTimeout(() => {
-                            this.timer = void 0;
-
-                            onSelect(0, { range: this.value });
-                        }, 1000);
-                    }
-                }
+                else onSelect(0, { range: this.value });
+                
             }
         },
         watch: {
@@ -205,16 +191,17 @@
                     { key: 'Vietnamese', text: 'Vietnamese', value: 'Vietnamese' },
                 ],
                 rooms: [
-                    { text: 'Студия+' },
-                    { text: '1+' },
-                    { text: '2+' },
-                    { text: '3+' },
-                    { text: '4+' },
-                    { text: 'СП+' },
+                    { text: 'Студия', group: 2 },
+                    { text: 'СП', group: 2 },
+                    { text: '1+', group: 1 },
+                    { text: '2+', group: 1 },
+                    { text: '3+', group: 1 },
+                    { text: '4+', group: 1 },
                 ],
                 lotTypes: [
                     { text: 'Квартира' },
                     { text: 'Апартаменты' },
+                    { text: 'Нежилое' },
                     { text: 'Машиноместо' },
                     { text: 'Кладовка' }
                 ],

@@ -1,7 +1,9 @@
 <template>
     <widget name="" wrap class="elevation-0 pa-2" align-center>
         <div slot="header">
-            <h3>КОРПУСА {{ filter.length }}</h3>
+            <div class="ui label secondary white--text">{{ filter.length ? `Найдено: ${filter.length}` : 'Ничего не найдено' }}</div>
+            <dropdown-filter :name="'sort'" class="secondary--text pa-1" multi inline :selected-index="0" label="Сортировка" header="параметры сортировки" filter-icon="fas fa-sort" :items="sort" :display-count="2"/>
+            <!-- <dropdown-filter :name="'sort1'" class="secondary--text pa-1" inline :selected-index="0" label="Сортировка" header="параметры сортировки" filter-icon="fas fa-sort" :items="sort"/> -->
         </div>
 
         <v-divider class="ma-1" slot="divider"/>
@@ -38,24 +40,7 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                                            
-                                <!-- <span>Апартаменты</span>
-                                <table class="ui definition table mt-0">
-                                    <tbody>
-                                        <tr>
-                                            <td class="pa-1">1-комн</td>
-                                            <td class="pa-1">45 - 46м2</td>
-                                            <td class="pa-1">10 - 11 млн</td>
-                                            <td class="pa-1">12</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="pa-1">2-комн</td>
-                                            <td class="pa-1">45 - 46м2</td>
-                                            <td class="pa-1">10 - 11 млн</td>
-                                            <td class="pa-1">12</td>
-                                        </tr>
-                                    </tbody>
-                                </table> -->
+                                        
                             </div>
                         </sui-card-description>
                     </sui-card-content>
@@ -71,9 +56,23 @@
 
 <script>
     import Widget from './class_widget';
-    
+    import dropdownFilter from '../elements/filter';
+
     export default {
         extends: Widget,
+        components: {
+            dropdownFilter
+        },
+        data() {
+            return {
+                sort: [
+                    { text: 'по дате' },
+                    { text: 'по стоимости' },
+                    { text: 'по площади' },
+                    { text: 'по плюшкам' }
+                ]
+            }
+        },
         computed: {
             filter() {
                 //debugger

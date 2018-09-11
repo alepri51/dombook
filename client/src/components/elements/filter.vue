@@ -159,16 +159,28 @@
         },
         methods: {
             onSelect(inx, item) {
-                !this.multi && (this.selection = {});
+                if(this.multi) {
+                    //debugger
+                    this.selection = Object.entries(this.selection).reduce((memo, entry) => {
+                        let [key, value] = entry;
+
+                        ((!value.group || (value.group && value.group !== item.group)) || (parseInt(key) === inx)) && (memo[key] = value);
+
+                        return memo;
+                    }, {})
+                }
+                else this.selection = {};
+
 
                 this.selection[inx] ? this.$delete(this.selection, inx) : this.$set(this.selection, inx, item);
 
-                this.$emit('select', { [this.name]: this.selection });
+                this.$emit('select', { [this.name]: Object.keys(this.selection).length ? this.selection : void 0 });
             },
             clear() {
                 this.selection = {};
                 this.open = false;
                 this.$emit('clear');
+                this.$emit('select', { [this.name]: void 0 });
             },
             toggle() {
                 this.open = ! this.open
