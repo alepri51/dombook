@@ -10,12 +10,32 @@ class Home extends Model {
         super(...args);
     }
 
+    normalize(data = {}) {
+        let normalized = super.normalize(data);
+        normalized._replace = true;
+        return normalized;
+    }
+
+    onNormalized(name, data) {
+        console.log(name);
+    }
+
     async default(filters) {
         console.log('HOME DEFAULT', filters);
 
+        filters.price = filters.price || [5000000, 10000000];
+        
         let match = Object.entries(filters).reduce((memo, entry) => {
             let [key, value] = entry;
-            key === 'price' && (memo['price'] = { $gte: value[0], $lte: value[1] });
+            
+            if(key === 'price') {
+                let diff = value[1] - value[0];
+                
+                if(diff > 5000000) value[1] = value[0] + 5000000;
+
+                memo['price'] = { $gte: value[0], $lte: value[1] }
+            };
+
             key === 'types' && (memo['lot_type.name'] = { $in: Object.entries(value).reduce((memo, entry) => {
                     let [key, value] = entry;
 
@@ -29,7 +49,6 @@ class Home extends Model {
         
         
         let buildings = await db.Lot.aggregate([
-            /* { "$match": { 'price': { $gt: filters.price[0], $lt: filters.price[1] } } }, */
             {
                 $lookup: {
                     from: 'filters',
@@ -66,6 +85,15 @@ class Home extends Model {
                     square_max: { $max: '$square'},
                 }
             },
+            /* {
+                $group: {
+                    _id: "$building",
+                    building: { $addToSet: "$building" },
+                }
+            },
+            {
+                $unwind: '$building'
+            }, */
             {
                 $lookup: {
                     from: 'buildings',
@@ -77,9 +105,6 @@ class Home extends Model {
             {
                 $unwind: '$building'
             },
-/*             {
-                $project: {
-                    _id: 0, name: "$staff.like", count: {$add: [1]}}} */
             {
                 $addFields: {
 

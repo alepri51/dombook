@@ -73,7 +73,13 @@
     import Widget from './class_widget';
     
     export default {
-        extends: Widget
+        extends: Widget,
+        computed: {
+            filter() {
+                //debugger
+                return this.raw_data;
+            }
+        }
         
     }
 </script>

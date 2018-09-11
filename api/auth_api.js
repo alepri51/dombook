@@ -98,7 +98,7 @@ class SignUp extends API {
             let payload = this.payload;
 
             payload = user.projection();
-            payload.key = account.public_key;
+            //payload.key = account.public_key;
 
             payload.auth = {
                 id: user.id,
